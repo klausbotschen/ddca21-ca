@@ -1,0 +1,53 @@
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+
+use work.core_pkg.all;
+use work.mem_pkg.all;
+use work.op_pkg.all;
+
+entity mem is
+	port (
+		clk           : in  std_logic;
+		res_n         : in  std_logic;
+		stall         : in  std_logic;
+		flush         : in  std_logic;
+
+		-- to Ctrl
+		mem_busy      : out std_logic; -- B
+
+		-- from EXEC
+		mem_op        : in  mem_op_type; -- branch_type, mem {rd, wr, type(bhw)}
+		wbop_in       : in  wb_op_type; -- rd_reg, wr, src_sel
+		pc_new_in     : in  pc_type;
+		pc_old_in     : in  pc_type;
+		aluresult_in  : in  data_type;
+		wrdata        : in  data_type;
+		zero          : in  std_logic;
+
+		-- to EXEC (forwarding)
+		reg_write     : out reg_write_type;
+
+		-- to FETCH
+		pc_new_out    : out pc_type;
+		pcsrc         : out std_logic;
+
+		-- to WB
+		wbop_out      : out wb_op_type;
+		pc_old_out    : out pc_type;
+		aluresult_out : out data_type;
+		memresult     : out data_type;
+
+		-- memory controller interface
+		mem_out       : out mem_out_type; -- addr, rd, rw, byteena, wrdata
+		mem_in        : in  mem_in_type; -- busy, rddata
+
+		-- exceptions
+		exc_load      : out std_logic; -- XL
+		exc_store     : out std_logic  -- XS
+	);
+end entity;
+
+architecture rtl of mem is
+begin
+end architecture;
