@@ -1,12 +1,19 @@
-*.wlf
+*.bak
+*~
+*.gz
+*.tgz
+*.zip
 work
+modelsim.ini
+output.txt
+*.cr.mti
+*.wlf
+*.mif
 log
 db
 incremental_db
 output_files
 transcript
-*.bak
-*~
 *.o
 *.cf
 *.rpt
@@ -20,7 +27,4 @@ transcript
 *.done
 *.pin
 *.sld
-*.gz
-*.tgz
-*.zip
 
