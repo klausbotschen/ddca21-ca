@@ -57,6 +57,7 @@ architecture rtl of decode is
 		return imm;
 	end function;
 
+	-- including << 1
 	function imm_b(inst : data_type) return data_type is
 		variable imm : data_type;
 	begin
@@ -68,6 +69,7 @@ architecture rtl of decode is
 		return imm;
 	end function;
 
+	-- including << 12
 	function imm_u(inst : data_type) return data_type is
 		variable imm : data_type;
 	begin
@@ -78,6 +80,7 @@ architecture rtl of decode is
 		return imm;
 	end function;
 
+	-- including << 1
 	function imm_j(inst : data_type) return data_type is
 		variable imm : data_type;
 	begin
@@ -93,7 +96,7 @@ architecture rtl of decode is
 
 	signal rs1, rs2, rd : reg_adr_type;
 	signal inst : instr_type;
-	signal imm : data_type;
+	signal imm, rd1, rd2 : data_type;
 
 begin
 
@@ -105,8 +108,8 @@ begin
 		stall      => stall,
 		rdaddr1    => rs1,
 		rdaddr2    => rs2,
-		rddata1    => exec_op.readdata1,
-		rddata2    => exec_op.readdata2,
+		rddata1    => rd1,
+		rddata2    => rd2,
 		wraddr     => reg_write.reg,
 		wrdata     => reg_write.data,
 		regwrite   => reg_write.write
@@ -141,44 +144,118 @@ sync: process(clk, res_n) is
 		rd <= inst(11 downto 7);
 		exec_op.rs1 <= rs1;
 		exec_op.rs2 <= rs2;
+		exec_op.readdata1 <= rd1;
+		exec_op.readdata2 <= rd2;
 		exec_op.imm <= imm;
 		exec_op.aluop <= ALU_NOP;
-		exec_op.alusrc1 <= '0'; -- alu mux, 0: rs2, 1: imm
-		exec_op.alusrc2 <= '0'; -- 1: use pc adder
-		exec_op.alusrc3 <= '0'; -- branch on 0/1
-		wb_op.rd <= rd;
+		exec_op.alusrc1 <= '0'; -- alu B mux, 0: rs2, 1: imm
+		exec_op.alusrc2 <= '0'; -- alu A mux, 0: rs1, 1: pc
+		exec_op.alusrc3 <= '0'; -- alu R mux: 0: normal, 1: to PC_new and pc(0)<='0'
+		mem_op.branch <= BR_NOP;
+		mem_op.mem <= MEMU_NOP;
+		wb_op <= WB_NOP;
 
-		imm <= imm_i(inst);
+		imm <= imm_i(inst); -- load, op_imm, jarl
 
 		case inst(6 downto 0) is
-			when "0000011" => -- LOAD
-			when "0100011" => -- STORE
-				imm <= imm_s(inst);
-			when "1100011" => -- BRANCH
-				imm <= imm_b(inst);
-				exec_op.alusrc2 <= '1'; -- add imm to pc
+			when "0110111" => -- LUI: rd=imm<<12
+				rs1 <= (others => '0');
+				rd1 <= (others => '0');
+				imm <= imm_u(inst); -- imm<<12
+				exec_op.aluop <= ALU_ADD; -- rd=0+imm
+				wb_op.rd <= rd;
+				wb_op.write <= '1';
+				wb_op.src <= WBS_ALU;
+			when "0010111" => -- AUIPC: rd=pc+(imm<<12)
+				exec_op.alusrc1 <= '1'; -- ALU-B <= imm
+				exec_op.alusrc2 <= '1'; -- ALU-A <= PC
+				imm <= imm_u(inst); -- imm<<12
+				wb_op.rd <= rd;
+				wb_op.write <= '1';
+				wb_op.src <= WBS_ALU;
+			when "1101111" => -- JAL: rd=pc+4; pc=pc+(imm<<1)
+				imm <= imm_j(inst); -- imm<<1
+				mem_op.branch <= BR_BR;
+				wb_op.rd <= rd;
+				wb_op.write <= '1';
+				wb_op.src <= WBS_OPC; -- old PC+4
+			when "1100111" => -- JALR
 				case func3 is
-					when "000" => -- BEQ rs1,rs2,imm
-						exec_op.aluop <= ALU_SUB; -- use Z bit
-					when "001" => -- BNE rs1,rs2,imm
-						exec_op.alusrc3 <= '1';
-						exec_op.aluop <= ALU_SUB; -- use Z bit
-					when "100" => -- BLT rs1,rs2,imm
-					when "101" => -- BGE rs1,rs2,imm
-					when "110" => -- BLTU rs1,rs2,imm
-					when "111" => -- BGEU rs1,rs2,imm
+					when "000" => -- JALR: rd=pc+4; pc=imm+rs1; pc[0]=’0’
+						exec_op.alusrc1 <= '1'; -- ALU-B <= imm
+						exec_op.alusrc3 <= '1'; -- PC_new <= ALU-R
+						mem_op.branch <= BR_BR;
+						wb_op.rd <= rd;
+						wb_op.write <= '1';
+						wb_op.src <= WBS_ALU;
 					when others =>
 						exc_dec <= '1';
 				end case;
-			when "1100111" => -- JALR
-			when "1101111" => -- JAL
-				imm <= imm_j(inst);
+			when "1100011" => -- BRANCH: pc=pc+(imm<<1)
+				imm <= imm_b(inst); -- imm<<1
+				mem_op.branch <= BR_CND;
+				case func3 is
+					when "000" => -- BEQ rs1,rs2,imm
+						exec_op.aluop <= ALU_SUB; -- jump when Z = '0'
+					when "001" => -- BNE rs1,rs2,imm
+						mem_op.branch <= BR_CNDI;
+						exec_op.aluop <= ALU_SUB; -- jump when Z = '1'
+					when "100" => -- BLT rs1,rs2,imm (signed)
+						exec_op.aluop <= ALU_SLT; -- jump when Z = '0'
+					when "101" => -- BGE rs1,rs2,imm (signed)
+						mem_op.branch <= BR_CNDI;
+						exec_op.aluop <= ALU_SLT; -- jump when Z = '1'
+					when "110" => -- BLTU rs1,rs2,imm (unsigned)
+						exec_op.aluop <= ALU_SLTU; -- jump when Z = '0'
+					when "111" => -- BGEU rs1,rs2,imm (unsigned)
+						mem_op.branch <= BR_CNDI;
+						exec_op.aluop <= ALU_SLTU; -- jump when Z = '1'
+					when others =>
+						exc_dec <= '1';
+				end case;
+			when "0000011" => -- LOAD
+				exec_op.alusrc1 <= '1'; -- add rs1 + imm
+				mem_op.mem.memread <= '1';
+				wb_op.rd <= rd;
+				wb_op.write <= '1';
+				wb_op.src <= WBS_MEM;
+				case func3 is
+					when "000" => -- LB rd,rs1,imm
+						mem_op.mem.memtype <= MEM_B;
+					when "001" => -- LH rd,rs1,imm
+						mem_op.mem.memtype <= MEM_H;
+					when "010" => -- LW rd,rs1,imm
+						mem_op.mem.memtype <= MEM_W;
+					when "100" => -- LBU rd,rs1,imm
+						mem_op.mem.memtype <= MEM_BU;
+					when "101" => -- LHU rd,rs1,imm
+						mem_op.mem.memtype <= MEM_HU;
+					when others =>
+						exc_dec <= '1';
+				end case;
+			when "0100011" => -- STORE
+				imm <= imm_s(inst);
+				exec_op.alusrc1 <= '1'; -- add rs1 + imm
+				mem_op.mem.memwrite <= '1';
+				case func3 is
+					when "000" => -- SB rs1,rs2,imm
+						mem_op.mem.memtype <= MEM_B;
+					when "001" => -- SH rs1,rs2,imm
+						mem_op.mem.memtype <= MEM_H;
+					when "010" => -- SW rs1,rs2,imm
+						mem_op.mem.memtype <= MEM_W;
+					when others =>
+						exc_dec <= '1';
+				end case;
 			when "0010011" => -- OP_IMM
-				exec_op.alusrc1 <= '1';
+				exec_op.alusrc1 <= '1'; -- rs1 (op) ^
+				wb_op.rd <= rd;
+				wb_op.write <= '1';
+				wb_op.src <= WBS_ALU;
 				case func3 is
 					when "000" => -- ADDI rd,rs1,imm
 						exec_op.aluop <= ALU_ADD;
-					when "001" => -- SLLI † rd,rs1,shamt
+					when "001" => -- SLLI rd,rs1,shamt
 						exec_op.aluop <= ALU_SLL;
 					when "010" => -- SLTI rd,rs1,imm
 						exec_op.aluop <= ALU_SLT;
@@ -200,6 +277,9 @@ sync: process(clk, res_n) is
 						exc_dec <= '1';
 				end case;
 			when "0110011" => -- OP
+				wb_op.rd <= rd;
+				wb_op.write <= '1';
+				wb_op.src <= WBS_ALU;
 				case func37 is
 					when "0000000000" => -- ADD rd,rs1,rs2
 						exec_op.aluop <= ALU_ADD;
@@ -224,11 +304,8 @@ sync: process(clk, res_n) is
 					when others =>
 						exc_dec <= '1';
 				end case;
-			when "0010111" => -- AUIPC
-				imm <= imm_u(inst);
-			when "0110111" => -- LUI
-				imm <= imm_u(inst);
 			when "0001111" => -- FENCE = nop
+				null;
 			when others =>
 				exc_dec <= '1';
 		end case;

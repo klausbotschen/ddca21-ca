@@ -14,7 +14,7 @@ entity mem is
 		flush         : in  std_logic;
 
 		-- to Ctrl
-		mem_busy      : out std_logic; -- B
+		mem_busy      : out std_logic;
 
 		-- from EXEC
 		mem_op        : in  mem_op_type; -- branch_type, mem {rd, wr, type(bhw)}
@@ -43,8 +43,8 @@ entity mem is
 		mem_in        : in  mem_in_type; -- busy, rddata
 
 		-- exceptions
-		exc_load      : out std_logic; -- XL
-		exc_store     : out std_logic  -- XS
+		exc_load      : out std_logic;
+		exc_store     : out std_logic
 	);
 end entity;
 
