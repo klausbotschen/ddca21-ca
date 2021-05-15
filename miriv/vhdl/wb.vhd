@@ -24,5 +24,42 @@ entity wb is
 end entity;
 
 architecture rtl of wb is
+	signal op_next : wb_op_type;
+	signal aluresult_next : data_type;
+	signal memresult_next : data_type;
+	signal pc_old_in_next : pc_type;
 begin
+	
+	-- TODO flush
+	
+	sync : process(res_n, clk) is 
+		-- Declaration(s) 
+	begin 
+		if(res_n = '0') then
+			-- Asynchronous Sequential Statement(s) 
+		elsif(rising_edge(clk)) then
+			if stall = '0' then
+				op_next <= op;
+				aluresult_next <= aluresult;
+				memresult_next <= memresult;
+				pc_old_in_next <= pc_old_in;
+			end if;
+		end if;
+	end process;
+	
+	async : process(all) is
+		-- Declaration(s)
+	begin
+		reg_write.write <= op_next.write;
+		reg_write.reg <= op_next.rd;
+		case op_next.src is
+			when WBS_ALU =>
+				op_next.data <= aluresult_next;
+			when WBS_MEM =>
+				op_next.data <= memresult_next;
+			when WBS_OPC =>
+				op_next.data <= to_data_type(pc_old_in_next);
+		end case;
+	end process;
+	
 end architecture;
