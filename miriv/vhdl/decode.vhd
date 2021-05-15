@@ -150,7 +150,7 @@ sync: process(clk, res_n) is
 		exec_op.aluop <= ALU_NOP;
 		exec_op.alusrc1 <= '0'; -- alu B mux, 0: rs2, 1: imm
 		exec_op.alusrc2 <= '0'; -- alu A mux, 0: rs1, 1: pc
-		exec_op.alusrc3 <= '0'; -- alu R mux: 0: normal, 1: to PC_new and pc(0)<='0'
+		exec_op.alusrc3 <= '0'; -- alu R mux: 0: normal, 1: pc(0)<='0'
 		mem_op.branch <= BR_NOP;
 		mem_op.mem <= MEMU_NOP;
 		wb_op <= WB_NOP;
@@ -162,19 +162,24 @@ sync: process(clk, res_n) is
 				rs1 <= (others => '0');
 				rd1 <= (others => '0');
 				imm <= imm_u(inst); -- imm<<12
+				exec_op.alusrc1 <= '1'; -- ALU-B <= imm
 				exec_op.aluop <= ALU_ADD; -- rd=0+imm
 				wb_op.rd <= rd;
 				wb_op.write <= '1';
 				wb_op.src <= WBS_ALU;
 			when "0010111" => -- AUIPC: rd=pc+(imm<<12)
+				imm <= imm_u(inst); -- imm<<12
 				exec_op.alusrc1 <= '1'; -- ALU-B <= imm
 				exec_op.alusrc2 <= '1'; -- ALU-A <= PC
-				imm <= imm_u(inst); -- imm<<12
+				exec_op.aluop <= ALU_ADD; -- rd=pc+imm
 				wb_op.rd <= rd;
 				wb_op.write <= '1';
 				wb_op.src <= WBS_ALU;
 			when "1101111" => -- JAL: rd=pc+4; pc=pc+(imm<<1)
 				imm <= imm_j(inst); -- imm<<1
+				exec_op.alusrc1 <= '1'; -- ALU-B <= imm
+				exec_op.alusrc2 <= '1'; -- ALU-A <= PC
+				exec_op.aluop <= ALU_ADD; -- rd=pc+imm
 				mem_op.branch <= BR_BR;
 				wb_op.rd <= rd;
 				wb_op.write <= '1';
@@ -183,7 +188,8 @@ sync: process(clk, res_n) is
 				case func3 is
 					when "000" => -- JALR: rd=pc+4; pc=imm+rs1; pc[0]=’0’
 						exec_op.alusrc1 <= '1'; -- ALU-B <= imm
-						exec_op.alusrc3 <= '1'; -- PC_new <= ALU-R
+						exec_op.alusrc3 <= '1'; -- pc(0)<='0'
+						exec_op.aluop <= ALU_ADD; -- rd=rs1+imm
 						mem_op.branch <= BR_BR;
 						wb_op.rd <= rd;
 						wb_op.write <= '1';
@@ -193,6 +199,9 @@ sync: process(clk, res_n) is
 				end case;
 			when "1100011" => -- BRANCH: pc=pc+(imm<<1)
 				imm <= imm_b(inst); -- imm<<1
+				exec_op.alusrc1 <= '1'; -- ALU-B <= imm
+				exec_op.alusrc2 <= '1'; -- ALU-A <= PC
+				exec_op.aluop <= ALU_ADD; -- rd=pc+imm
 				mem_op.branch <= BR_CND;
 				case func3 is
 					when "000" => -- BEQ rs1,rs2,imm
@@ -214,7 +223,8 @@ sync: process(clk, res_n) is
 						exc_dec <= '1';
 				end case;
 			when "0000011" => -- LOAD
-				exec_op.alusrc1 <= '1'; -- add rs1 + imm
+				exec_op.alusrc1 <= '1'; -- ALU-B <= imm
+				exec_op.aluop <= ALU_ADD; -- rd=rs1+imm
 				mem_op.mem.memread <= '1';
 				wb_op.rd <= rd;
 				wb_op.write <= '1';
@@ -235,7 +245,8 @@ sync: process(clk, res_n) is
 				end case;
 			when "0100011" => -- STORE
 				imm <= imm_s(inst);
-				exec_op.alusrc1 <= '1'; -- add rs1 + imm
+				exec_op.alusrc1 <= '1'; -- ALU-B <= imm
+				exec_op.aluop <= ALU_ADD; -- rd=rs1+imm
 				mem_op.mem.memwrite <= '1';
 				case func3 is
 					when "000" => -- SB rs1,rs2,imm
@@ -248,7 +259,7 @@ sync: process(clk, res_n) is
 						exc_dec <= '1';
 				end case;
 			when "0010011" => -- OP_IMM
-				exec_op.alusrc1 <= '1'; -- rs1 (op) ^
+				exec_op.alusrc1 <= '1'; -- ALU-B <= imm
 				wb_op.rd <= rd;
 				wb_op.write <= '1';
 				wb_op.src <= WBS_ALU;
