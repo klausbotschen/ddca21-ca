@@ -2,22 +2,38 @@ onerror {resume}
 quietly WaveActivateNextPane {} 0
 add wave -noupdate /tb/clk
 add wave -noupdate /tb/res_n
+
 add wave -noupdate -divider Input
-add wave -noupdate /tb/fetch_inst/stall
-add wave -noupdate /tb/fetch_inst/flush
-add wave -noupdate /tb/fetch_inst/pcsrc
-add wave -noupdate -radix unsigned /tb/fetch_inst/pc_in
-add wave -noupdate /tb/fetch_inst/mem_in.busy
-add wave -noupdate -radix hex /tb/fetch_inst/mem_in.rddata
+add wave -noupdate /tb/uut/stall
+add wave -noupdate /tb/uut/flush
+add wave -noupdate -radix unsigned /tb/uut/pc_in
+add wave -noupdate -radix hex /tb/uut/instr
+add wave -noupdate /tb/uut/reg_write.write
+add wave -noupdate -radix hex /tb/uut/reg_write.reg
+add wave -noupdate -radix hex /tb/uut/reg_write.data
+
 add wave -noupdate -divider Output
-add wave -noupdate /tb/fetch_inst/mem_busy
-add wave -noupdate -radix unsigned /tb/fetch_inst/pc_out
-add wave -noupdate -radix hex /tb/fetch_inst/instr
-add wave -noupdate -radix unsigned /tb/fetch_inst/mem_out.address
-add wave -noupdate /tb/fetch_inst/mem_out.rd
-add wave -noupdate /tb/fetch_inst/mem_out.wr
-add wave -noupdate -radix hex /tb/fetch_inst/mem_out.byteena
-add wave -noupdate -radix hex /tb/fetch_inst/mem_out.wrdata
+add wave -noupdate -radix unsigned /tb/uut/pc_out
+
+add wave -noupdate /tb/uut/exec_op.aluop
+add wave -noupdate /tb/uut/exec_op.alusrc1
+add wave -noupdate /tb/uut/exec_op.alusrc2
+add wave -noupdate /tb/uut/exec_op.alusrc3
+add wave -noupdate -radix hex /tb/uut/exec_op.rs1
+add wave -noupdate -radix hex /tb/uut/exec_op.rs2
+add wave -noupdate -radix hex /tb/uut/exec_op.readdata1
+add wave -noupdate -radix hex /tb/uut/exec_op.readdata2
+add wave -noupdate -radix hex /tb/uut/exec_op.imm
+
+add wave -noupdate /tb/uut/mem_op.branch
+add wave -noupdate /tb/uut/mem_op.mem.memread
+add wave -noupdate /tb/uut/mem_op.mem.memwrite
+add wave -noupdate /tb/uut/mem_op.mem.memtype
+
+add wave -noupdate /tb/uut/wb_op.rd
+add wave -noupdate /tb/uut/wb_op.write
+add wave -noupdate -radix hex /tb/uut/wb_op.src
+
 TreeUpdate [SetDefaultTree]
 WaveRestoreCursors {{Cursor 1} {0 ps} 0}
 quietly wave cursor active 0

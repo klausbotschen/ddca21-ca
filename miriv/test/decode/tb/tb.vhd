@@ -53,15 +53,15 @@ architecture bench of tb is
 		l := get_next_valid_line(f);
 		result.flush := str_to_sl(l(1));
 		l := get_next_valid_line(f);
-		result.pc_in := bin_to_slv(l.all, PC_WIDTH);
+		result.pc_in := hex_to_slv(l.all, PC_WIDTH);
 		l := get_next_valid_line(f);
-		result.instr := bin_to_slv(l.all, INSTR_WIDTH);
+		result.instr := hex_to_slv(l.all, INSTR_WIDTH);
 		l := get_next_valid_line(f);
 		result.reg_write.write := str_to_sl(l(1));
 		l := get_next_valid_line(f);
 		result.reg_write.reg := bin_to_slv(l.all, REG_BITS);
 		l := get_next_valid_line(f);
-		result.reg_write.data := bin_to_slv(l.all, DATA_WIDTH);
+		result.reg_write.data := hex_to_slv(l.all, DATA_WIDTH);
 		return result;
 	end function;
 
@@ -70,7 +70,7 @@ architecture bench of tb is
 		variable result : output_t;
 	begin
 		l := get_next_valid_line(f);
-		result.pc_out := bin_to_slv(l.all, PC_WIDTH);
+		result.pc_out := hex_to_slv(l.all, PC_WIDTH);
 
 		l := get_next_valid_line(f);
 		result.exec_op.aluop := str_to_alu_op(l.all);
@@ -85,11 +85,11 @@ architecture bench of tb is
 		l := get_next_valid_line(f);
 		result.exec_op.rs2 := bin_to_slv(l.all, REG_BITS);
 		l := get_next_valid_line(f);
-		result.exec_op.readdata1 := bin_to_slv(l.all, DATA_WIDTH);
+		result.exec_op.readdata1 := hex_to_slv(l.all, DATA_WIDTH);
 		l := get_next_valid_line(f);
-		result.exec_op.readdata2 := bin_to_slv(l.all, DATA_WIDTH);
+		result.exec_op.readdata2 := hex_to_slv(l.all, DATA_WIDTH);
 		l := get_next_valid_line(f);
-		result.exec_op.imm := bin_to_slv(l.all, DATA_WIDTH);
+		result.exec_op.imm := hex_to_slv(l.all, DATA_WIDTH);
 
 		l := get_next_valid_line(f);
 		result.mem_op.branch := str_to_branch_op(l.all);
@@ -133,7 +133,7 @@ architecture bench of tb is
 			& " rs1=" & to_string(outp.exec_op.rs1)
 			& " rs2=" & to_string(outp.exec_op.rs2)
 			& " readdata1=" & to_string(outp.exec_op.readdata1)
-			& " readdata2=" & to_string(outp.exec_op.readdata1)
+			& " readdata2=" & to_string(outp.exec_op.readdata2)
 			& " imm=" & to_string(outp.exec_op.imm)
 			& "} mem_op {branch=" & to_string(outp.mem_op.branch)
 			& " mem.memread=" & to_string(outp.mem_op.mem.memread)
@@ -155,7 +155,7 @@ architecture bench of tb is
 			& " rs1=" & to_string(output_ref.exec_op.rs1)
 			& " rs2=" & to_string(output_ref.exec_op.rs2)
 			& " readdata1=" & to_string(output_ref.exec_op.readdata1)
-			& " readdata2=" & to_string(output_ref.exec_op.readdata1)
+			& " readdata2=" & to_string(output_ref.exec_op.readdata2)
 			& " imm=" & to_string(output_ref.exec_op.imm)
 			& "} mem_op {branch=" & to_string(output_ref.mem_op.branch)
 			& " mem.memread=" & to_string(output_ref.mem_op.mem.memread)
@@ -170,7 +170,7 @@ architecture bench of tb is
 
 begin
 
-	decode_inst : entity work.decode
+	uut : entity work.decode
 	port map (
 		clk        => clk,
 		res_n      => res_n,
