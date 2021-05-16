@@ -55,7 +55,7 @@ architecture bench of tb is
 		l := get_next_valid_line(f);
 		result.pc_in := hex_to_slv(l.all, PC_WIDTH);
 		l := get_next_valid_line(f);
-		result.instr := hex_to_slv(l.all, INSTR_WIDTH);
+		result.instr := bin_to_slv(l.all, INSTR_WIDTH);
 		l := get_next_valid_line(f);
 		result.reg_write.write := str_to_sl(l(1));
 		l := get_next_valid_line(f);

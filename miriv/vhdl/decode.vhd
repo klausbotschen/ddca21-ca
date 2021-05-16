@@ -63,7 +63,7 @@ architecture rtl of decode is
 	begin
 		imm := (11 => inst(7),
 						10 downto 5 => inst(30 downto 25),
-						4 downto 1 => inst(24 downto 21),
+						4 downto 1 => inst(11 downto 8),
 						0 => '0',
 						others => inst(31));
 		return imm;
