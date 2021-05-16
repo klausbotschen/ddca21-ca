@@ -30,19 +30,23 @@ architecture rtl of wb is
 	signal pc_old_in_next : pc_type;
 begin
 	
-	-- TODO flush
-	
 	sync : process(res_n, clk) is 
 		-- Declaration(s) 
 	begin 
 		if(res_n = '0') then
-			-- Asynchronous Sequential Statement(s) 
+				op_next <= WB_NOP;
+				aluresult_next <= (others => '0');
+				memresult_next <= (others => '0');
+				pc_old_in_next <= (others => '0');
 		elsif(rising_edge(clk)) then
 			if stall = '0' then
 				op_next <= op;
 				aluresult_next <= aluresult;
 				memresult_next <= memresult;
 				pc_old_in_next <= pc_old_in;
+			end if;
+			if flush = '1' then
+				op_next <= WB_NOP;
 			end if;
 		end if;
 	end process;
@@ -54,11 +58,11 @@ begin
 		reg_write.reg <= op_next.rd;
 		case op_next.src is
 			when WBS_ALU =>
-				op_next.data <= aluresult_next;
+				reg_write.data <= aluresult_next;
 			when WBS_MEM =>
-				op_next.data <= memresult_next;
+				reg_write.data <= memresult_next;
 			when WBS_OPC =>
-				op_next.data <= to_data_type(pc_old_in_next);
+				reg_write.data <= to_data_type(pc_old_in_next);
 		end case;
 	end process;
 	

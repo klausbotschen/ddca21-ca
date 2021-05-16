@@ -4,6 +4,7 @@ use ieee.numeric_std.all;
 
 use work.core_pkg.all;
 use work.op_pkg.all;
+use work.alu;
 
 entity exec is
 	port (
@@ -36,75 +37,63 @@ entity exec is
 end entity;
 
 architecture rtl of exec is
+	
+	constant PC_MASK : pc_type := (	0 => '0',
+												others => '1');
+	
+	-- next ALU operation data from previous stage
 	signal op_next : exec_op_type;
+	
+	-- ALU
 	signal aluA, aluB : data_type;
+	
+	-- pc-adder
+	signal pc_adder_input1, pc_adder_out : pc_type;
+	
 	signal aluZ : std_logic;
 	signal pc_add : pc_type;
 begin
 	
 	-- forwarding data and control purpose in exercise IV, not used in exercise III:
-	exec_op <= (others => '0');
+	-- exec_op;
 	-- reg_write_mem
 	-- reg_write_wr
 	
-	-- if branch instruction
-	-- TODO
+	-- use conditional statement, not selected
 	pc_new_out <= std_logic_vector(unsigned(pc_in) + unsigned(pc_add)) when aluZ = '1' else pc_in;
 	zero <= aluZ;
 	
+	-- 1-MUX controlling input data for ALU input A
+	aluA	<=	to_data_type(pc_in) when op_next.alusrc2 = '1' else
+				op_next.readdata1;
 	
-	sync : process(res_n, clk) is 
-		-- Declaration(s) 
+	-- 1-MUX controlling input data for ALU input B
+	aluB	<=	op_next.imm when op_next.alusrc1 = '1' else
+				op_next.readdata2;
+	
+	-- 1-MUX controlling input data for first input of PC-adder (second input is always connected to op_next.imm)
+	pc_adder_input1	<=	to_pc_type(op_next.readdata1) when op_next.alusrc3 = '1' else
+								pc_in;
+	
+	-- PC-adder
+	pc_adder_out <= std_logic_vector(unsigned(pc_adder_input1) + unsigned(to_pc_type(op_next.imm)));
+	
+	-- hard wire LSB of PC-adder output to '0'
+	pc_new_out <= pc_adder_out and PC_MASK;
+	
+	sync : process(res_n, clk) is
 	begin 
 		if(res_n = '0') then
-			-- Asynchronous Sequential Statement(s) 
+			op_next <= EXEC_NOP;
 		elsif(rising_edge(clk)) then
 			op_next <= op;
 		end if;
 	end process;
 	
 	async : process(all) is
-		-- Declaration(s)
 	begin
-		pc_new_out <= pc_in; -- if no branch is taken
-		
-		-- TODO
-		case op_next.alusrc1 & op_next.alusrc2 & op_next.alusrc3 is
-			when "000" =>
-				aluA <= op.rddata1;
-				aluB <= op.rddata2;
-				wrdata <= aluresult;
-			when "001" =>
-				aluA <= op.rddata1;
-				aluB <= op.rddata2;
-				
-			when "010" =>
-				aluA <= op.rddata1;
-				aluB <= op.imm;
-				wrdata <= aluresult;
-			when "011" =>
-				aluA <= op.rddata1;
-				aluB <= op.imm;
-				
-			when "100" =>
-				aluA <= op.imm;
-				aluB <= op.rddata2;
-				wrdata <= aluresult;
-			when "101" =>
-				aluA <= op.imm;
-				aluB <= op.rddata2;
-				
-			when "110" =>
-				aluA <= op.imm;
-				aluB <= op.imm;
-				wrdata <= aluresult;
-			when "111" =>
-				aluA <= op.imm;
-				aluB <= op.imm;
-				
-		end case;
-		
 		pc_old_out <= pc_in;
+		wrdata <= op_next.readdata2;
 		
 		if flush = '1' then -- flush: write NOPs to subsequent stage
 			memop_out <= MEM_NOP;
@@ -122,7 +111,7 @@ begin
 		A => aluA,
 		B => aluB,
 		R => aluresult,
-		Z => aluZ
+		Z => zero
 	);
 	
 end architecture;

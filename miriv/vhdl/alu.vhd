@@ -27,11 +27,11 @@ begin
 				R <= B;
 			when ALU_SLT =>
 				R(R'high-1 downto 1) <= (others => '0');
-				R(0) <= '1' when signed(A) < signed(B) else '0';
+				if signed(A) < signed(B) then R(0) <= '1'; else R(0) <= '0'; end if;
 				Z <= not R(0);
 			when ALU_SLTU =>
 				R(R'high-1 downto 1) <= (others => '0');
-				R(0) <= '1' when unsigned(A) < unsigned(B) else '0';
+				if unsigned(A) < unsigned(B) then R(0) <= '1'; else R(0) <= '0'; end if;
 				Z <= not R(0);
 			when ALU_SLL => -- A sll B(4 downto 0)
 				shiftby := to_integer(unsigned(B(4 downto 0)));
