@@ -155,6 +155,7 @@ sync: process(clk, res_n) is
 		mem_op.branch <= BR_NOP; -- set pcscr<='1' when branch
 		mem_op.mem <= MEMU_NOP;
 		wb_op <= WB_NOP;
+		exc_dec <= '0';
 
 		imm <= imm_i(inst); -- load, op_imm, jarl
 

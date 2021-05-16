@@ -107,6 +107,9 @@ architecture bench of tb is
 		l := get_next_valid_line(f);
 		result.wb_op.src := str_to_wbs_op(l.all);
 
+		l := get_next_valid_line(f);
+		result.exc_dec := str_to_sl(l(1));
+
 		return result;
 	end function;
 
@@ -142,7 +145,8 @@ architecture bench of tb is
 			& "} wb_op {rd=" & to_string(outp.wb_op.rd)
 			& " write=" & to_string(outp.wb_op.write)
 			& " src=" & to_string(outp.wb_op.src)
-			& "}" & lf severity note;
+			& "} exc_dec=" & to_string(outp.exc_dec)
+			& lf severity note;
 		if passed then
 			report " >> PASSED!" severity note;
 		else
@@ -164,7 +168,8 @@ architecture bench of tb is
 			& "} wb_op {rd=" & to_string(output_ref.wb_op.rd)
 			& " write=" & to_string(output_ref.wb_op.write)
 			& " src=" & to_string(output_ref.wb_op.src)
-			& "}" & lf severity error;
+			& "} exc_dec=" & to_string(output_ref.exc_dec)
+			& lf severity error;
 		end if;
 	end procedure;
 
