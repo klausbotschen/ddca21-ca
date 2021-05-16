@@ -1,4 +1,3 @@
--- altera vhdl_input_version vhdl_2008
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
@@ -41,12 +40,7 @@ architecture rtl of decode is
 	function imm_i(inst : data_type) return data_type is
 		variable imm : data_type;
 	begin
-		-- previous version:
---		imm := (10 downto 5 => inst(30 downto 25),
---						4 downto 1 => inst(24 downto 21),
---						0 => inst(20),
---						others => inst(31));
-		imm := (others => inst(31));
+		imm(31 downto 11) := (others => inst(31));
 		imm(10 downto 5) := inst(30 downto 25);
 		imm(4 downto 1) := inst(24 downto 21);
 		imm(0) := inst(20);
@@ -56,12 +50,7 @@ architecture rtl of decode is
 	function imm_s(inst : data_type) return data_type is
 		variable imm : data_type;
 	begin
-		-- previous version:
---		imm := (10 downto 5 => inst(30 downto 25),
---						4 downto 1 => inst(11 downto 8),
---						0 => inst(7),
---						others => inst(31));
-		imm := (others => inst(31));
+		imm(31 downto 11) := (others => inst(31));
 		imm(10 downto 5) := inst(30 downto 25);
 		imm(4 downto 1) := inst(11 downto 8);
 		imm(0) := inst(7);
@@ -72,13 +61,7 @@ architecture rtl of decode is
 	function imm_b(inst : data_type) return data_type is
 		variable imm : data_type;
 	begin
-		-- previous version:
---		imm := (11 => inst(7),
---						10 downto 5 => inst(30 downto 25),
---						4 downto 1 => inst(11 downto 8),
---						0 => '0',
---						others => inst(31));
-		imm := (others => inst(31));
+		imm(31 downto 12) := (others => inst(31));
 		imm(11) := inst(7);
 		imm(10 downto 5) := inst(30 downto 25);
 		imm(4 downto 1) := inst(11 downto 8);
@@ -90,15 +73,10 @@ architecture rtl of decode is
 	function imm_u(inst : data_type) return data_type is
 		variable imm : data_type;
 	begin
-		-- previous version:
---		imm := (31 => inst(31),
---						30 downto 20 => inst(30 downto 20),
---						19 downto 12 => inst(19 downto 12),
---						others => '0');
-		imm := (others => '0');
 		imm(31) := inst(31);
 		imm(30 downto 20) := inst(30 downto 20);
 		imm(19 downto 12) := inst(19 downto 12);
+		imm(11 downto 0) := (others => '0');
 		return imm;
 	end function;
 
@@ -106,14 +84,7 @@ architecture rtl of decode is
 	function imm_j(inst : data_type) return data_type is
 		variable imm : data_type;
 	begin
-		-- previous version:
---		imm := (19 downto 12 => inst(19 downto 12),
---						11 => inst(20),
---						10 downto 5 => inst(30 downto 25),
---						4 downto 1 => inst(24 downto 21),
---						0 => '0',
---						others => inst(31));
-		imm := (others => inst(31));
+		imm(31 downto 20) := (others => inst(31));
 		imm(19 downto 12) := inst(19 downto 12);
 		imm(11) := inst(20);
 		imm(10 downto 5) := inst(30 downto 25);
@@ -123,7 +94,7 @@ architecture rtl of decode is
 	end function;
 	----------------------------------------------
 
-	signal rs1, rs2, rd : reg_adr_type;
+	signal rd : reg_adr_type;
 	signal inst : instr_type;
 	signal imm, rd1, rd2 : data_type;
 
@@ -135,8 +106,8 @@ begin
 		clk        => clk,
 		res_n      => res_n,
 		stall      => stall,
-		rdaddr1    => rs1,
-		rdaddr2    => rs2,
+		rdaddr1    => instr(19 downto 15),
+		rdaddr2    => instr(24 downto 20),
 		rddata1    => rd1,
 		rddata2    => rd2,
 		wraddr     => reg_write.reg,
@@ -168,11 +139,9 @@ sync: process(clk, res_n) is
 		func3 := inst(14 downto 12);
 		func37(9 downto 7) := inst(14 downto 12);
 		func37(6 downto 0) := inst(31 downto 25);
-		rs1 <= inst(19 downto 15);
-		rs2 <= inst(24 downto 20);
 		rd <= inst(11 downto 7);
-		exec_op.rs1 <= rs1;
-		exec_op.rs2 <= rs2;
+		exec_op.rs1 <= inst(19 downto 15);
+		exec_op.rs2 <= inst(24 downto 20);
 		exec_op.readdata1 <= rd1;
 		exec_op.readdata2 <= rd2;
 		exec_op.imm <= imm;
