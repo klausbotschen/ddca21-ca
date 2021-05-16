@@ -149,9 +149,10 @@ sync: process(clk, res_n) is
 		exec_op.imm <= imm;
 		exec_op.aluop <= ALU_NOP;
 		exec_op.alusrc1 <= '0'; -- alu B mux, 0: rs2, 1: imm
-		exec_op.alusrc2 <= '0'; -- alu A mux, 0: rs1, 1: pc
-		exec_op.alusrc3 <= '0'; -- alu R mux: 0: normal, 1: pc(0)<='0'
-		mem_op.branch <= BR_NOP;
+		exec_op.alusrc2 <= '0'; -- alu A mux, 0: rs1, 1: pc (AUIPC)
+		exec_op.alusrc3 <= '0'; -- PC adder mux, 0: PC+imm, 1: rs1+imm (JALR)
+		-- note, after the PC adder bit 0 shall be hard wired to '0'!
+		mem_op.branch <= BR_NOP; -- set pcscr<='1' when branch
 		mem_op.mem <= MEMU_NOP;
 		wb_op <= WB_NOP;
 
@@ -159,11 +160,9 @@ sync: process(clk, res_n) is
 
 		case inst(6 downto 0) is
 			when "0110111" => -- LUI: rd=imm<<12
-				rs1 <= (others => '0');
-				rd1 <= (others => '0');
 				imm <= imm_u(inst); -- imm<<12
 				exec_op.alusrc1 <= '1'; -- ALU-B <= imm
-				exec_op.aluop <= ALU_ADD; -- rd=0+imm
+				exec_op.aluop <= ALU_NOP; -- select B
 				wb_op.rd <= rd;
 				wb_op.write <= '1';
 				wb_op.src <= WBS_ALU;
@@ -177,32 +176,24 @@ sync: process(clk, res_n) is
 				wb_op.src <= WBS_ALU;
 			when "1101111" => -- JAL: rd=pc+4; pc=pc+(imm<<1)
 				imm <= imm_j(inst); -- imm<<1
-				exec_op.alusrc1 <= '1'; -- ALU-B <= imm
-				exec_op.alusrc2 <= '1'; -- ALU-A <= PC
-				exec_op.aluop <= ALU_ADD; -- rd=pc+imm
-				mem_op.branch <= BR_BR;
+				mem_op.branch <= BR_BR; -- pcsrc <= '1'
 				wb_op.rd <= rd;
 				wb_op.write <= '1';
 				wb_op.src <= WBS_OPC; -- old PC+4
 			when "1100111" => -- JALR
 				case func3 is
 					when "000" => -- JALR: rd=pc+4; pc=imm+rs1; pc[0]=’0’
-						exec_op.alusrc1 <= '1'; -- ALU-B <= imm
 						exec_op.alusrc3 <= '1'; -- pc(0)<='0'
-						exec_op.aluop <= ALU_ADD; -- rd=rs1+imm
-						mem_op.branch <= BR_BR;
+						mem_op.branch <= BR_BR; -- pcsrc <= '1'
 						wb_op.rd <= rd;
 						wb_op.write <= '1';
-						wb_op.src <= WBS_ALU;
+						wb_op.src <= WBS_OPC; -- old PC+4
 					when others =>
 						exc_dec <= '1';
 				end case;
 			when "1100011" => -- BRANCH: pc=pc+(imm<<1)
 				imm <= imm_b(inst); -- imm<<1
-				exec_op.alusrc1 <= '1'; -- ALU-B <= imm
-				exec_op.alusrc2 <= '1'; -- ALU-A <= PC
-				exec_op.aluop <= ALU_ADD; -- rd=pc+imm
-				mem_op.branch <= BR_CND;
+				mem_op.branch <= BR_CND; -- pcsrc <= '1'
 				case func3 is
 					when "000" => -- BEQ rs1,rs2,imm
 						exec_op.aluop <= ALU_SUB; -- jump when Z = '0'
