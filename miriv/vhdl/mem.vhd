@@ -5,6 +5,7 @@ use ieee.numeric_std.all;
 use work.core_pkg.all;
 use work.mem_pkg.all;
 use work.op_pkg.all;
+use work.memu;
 
 entity mem is
 	port (
@@ -49,5 +50,64 @@ entity mem is
 end entity;
 
 architecture rtl of mem is
+	signal mem_op_next : mem_op_type;
+	signal addr : data_type;
 begin
+	
+	sync : process(res_n, clk) is 
+	begin 
+		if(res_n = '0') then
+			mem_op_next <= MEM_NOP;
+		elsif(rising_edge(clk)) then
+			if stall = '0' then
+				mem_op_next <= mem_op;
+			else
+				mem_op_next.mem.memread <= '0';
+				mem_op_next.mem.memwrite <= '0';
+			end if;
+		end if;
+	end process;
+	
+	async : process(all) is
+	begin
+		
+		case mem_op_next.branch is
+			when BR_NOP		=>
+				pcsrc <= '0';
+			when BR_BR		=>
+				pcsrc <= '1';
+			when BR_CND		=>
+				if zero = '0' then pcsrc <= '1'; end if;
+			when BR_CNDI	=>
+				pcsrc <= '1';
+				if zero = '1' then pcsrc <= '1'; end if;
+		end case;
+		
+		if flush = '1' then
+			wbop_out <= WB_NOP;
+			pc_new_out <= pc_new_in;
+			pc_old_out <= pc_old_in;
+			aluresult_out <= aluresult_in;
+		else -- regular operation: tunnel through
+			wbop_out <= wbop_in;
+			pc_new_out <= pc_new_in;
+			pc_old_out <= pc_old_in;
+			aluresult_out <= aluresult_in;
+		end if;
+	end process;
+	
+	memu_inst : memu
+	port map 
+	(
+		op => mem_op_next.mem,
+		A => aluresult_in,		-- ALU calculates address
+		W => wrdata,
+		R => memresult,
+		B => mem_busy,
+		XL => exc_load,
+		XS => exc_store,
+		D => mem_in,
+		M => mem_out
+	);
+
 end architecture;
