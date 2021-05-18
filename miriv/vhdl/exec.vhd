@@ -50,18 +50,13 @@ architecture rtl of exec is
 	-- pc-adder
 	signal pc_adder_input1, pc_adder_out : pc_type;
 	
-	signal aluZ : std_logic;
 	signal pc_add : pc_type;
 begin
 	
 	-- forwarding data and control purpose in exercise IV, not used in exercise III:
-	-- exec_op;
+	exec_op <= EXEC_NOP;
 	-- reg_write_mem
 	-- reg_write_wr
-	
-	-- use conditional statement, not selected
-	pc_new_out <= std_logic_vector(unsigned(pc_in) + unsigned(pc_add)) when aluZ = '1' else pc_in;
-	zero <= aluZ;
 	
 	-- 1-MUX controlling input data for ALU input A
 	aluA	<=	to_data_type(pc_in) when op_next.alusrc2 = '1' else

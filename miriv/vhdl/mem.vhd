@@ -54,6 +54,11 @@ architecture rtl of mem is
 	signal addr : data_type;
 begin
 	
+	-- used in exercise IV:
+	reg_write.write <= '0';
+	reg_write.reg <= (others => '0');
+	reg_write.data <= (others => '0');
+	
 	sync : process(res_n, clk) is 
 	begin 
 		if(res_n = '0') then
@@ -71,6 +76,8 @@ begin
 	async : process(all) is
 	begin
 		
+		pcsrc <= '0';
+		
 		case mem_op_next.branch is
 			when BR_NOP		=>
 				pcsrc <= '0';
@@ -81,6 +88,8 @@ begin
 			when BR_CNDI	=>
 				pcsrc <= '1';
 				if zero = '1' then pcsrc <= '1'; end if;
+			when others =>
+				pcsrc <= '0';
 		end case;
 		
 		if flush = '1' then

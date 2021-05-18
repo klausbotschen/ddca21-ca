@@ -22,6 +22,7 @@ begin
 		variable shiftby : natural;
 	begin
 		Z <= '-';
+		R <= (others => '0');
 		case op is
 			when ALU_NOP =>
 				R <= B;
