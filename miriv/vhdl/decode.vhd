@@ -154,8 +154,7 @@ sync: process(clk, res_n) is
 		mem_op.mem <= MEMU_NOP;
 		wb_op <= WB_NOP;
 		exc_dec <= '0';
-
-		imm <= imm_i(inst); -- load, op_imm, jarl
+		imm <= (others => '0');
 
 		case inst(6 downto 0) is
 			when "0110111" => -- LUI: rd=imm<<12
@@ -182,6 +181,7 @@ sync: process(clk, res_n) is
 			when "1100111" => -- JALR
 				case func3 is
 					when "000" => -- JALR: rd=pc+4; pc=imm+rs1; pc[0]=’0’
+						imm <= imm_i(inst); -- load, op_imm, jarl
 						exec_op.alusrc3 <= '1'; -- pc(0)<='0'
 						mem_op.branch <= BR_BR; -- pcsrc <= '1'
 						wb_op.rd <= rd;
@@ -213,6 +213,7 @@ sync: process(clk, res_n) is
 						exc_dec <= '1';
 				end case;
 			when "0000011" => -- LOAD
+				imm <= imm_i(inst); -- load, op_imm, jarl
 				exec_op.alusrc1 <= '1'; -- ALU-B <= imm
 				exec_op.aluop <= ALU_ADD; -- rd=rs1+imm
 				mem_op.mem.memread <= '1';
@@ -249,6 +250,7 @@ sync: process(clk, res_n) is
 						exc_dec <= '1';
 				end case;
 			when "0010011" => -- OP_IMM
+				imm <= imm_i(inst); -- load, op_imm, jarl
 				exec_op.alusrc1 <= '1'; -- ALU-B <= imm
 				wb_op.rd <= rd;
 				wb_op.write <= '1';
