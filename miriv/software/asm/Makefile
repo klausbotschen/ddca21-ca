@@ -2,7 +2,7 @@ PREFIX=/opt/ddca/riscv/bin/riscv32-unknown-elf
 
 CC=${PREFIX}-gcc
 AS=${PREFIX}-as
-LD=${PREFIX}-ld -N --section-start=.text=0x0 -no-relex
+LD=${PREFIX}-ld -N --section-start=.text=0x0 --no-relax
 AR=${PREFIX}-ar
 OBJCOPY=${PREFIX}-objcopy
 

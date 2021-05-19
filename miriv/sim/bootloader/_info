@@ -7,7 +7,7 @@ z2
 !i10e 25
 !i10f 100
 cModel Technology
-d/home/florian/repos/teaching/ddca/2021/ca/miriv/bootloader_sim
+d/home/edauser/repos/ddca/2021/ca/miriv/bootloader_sim
 Ecounter
 w0
 Z0 DPx4 work 7 mem_pkg 0 22 Shhno1ahZ@U86B;^D`ai30
@@ -21,10 +21,10 @@ l0
 L7
 VJZIkkz9BTWgZlzcb]A:KW1
 !s100 RJZ50;Zg;onm9HP[WeZ@40
-Z6 OE;C;10.6c_1;65
+Z6 OV;C;10.5b;63
 33
-Z7 !s110 1620413174
-!i113 0
+Z7 !s110 1621411868
+!i113 1
 Z8 o-work bootloader -2008 -nodebug
 Z9 tExplicit 1 CvgOpt 0
 Aimpl
@@ -40,7 +40,7 @@ V@F;onT;0[DN?Q;63LH7[o3
 R6
 33
 R7
-!i113 0
+!i113 1
 R8
 R9
 Edelay
@@ -59,7 +59,7 @@ ViMI4TdSZN<jmT6[R>[X^]3
 R6
 33
 R7
-!i113 0
+!i113 1
 R8
 R9
 Aimpl
@@ -75,7 +75,7 @@ V=za<40IZgn@`f<VHh2EK=1
 R6
 33
 R7
-!i113 0
+!i113 1
 R8
 R9
 Edev
@@ -93,12 +93,12 @@ VeJICl5>l>09J76abDMo2j0
 !s100 0Y30eh@bh129h40EDOC<M0
 R6
 33
-Z12 !s110 1620413175
-!i113 0
+R7
+!i113 1
 R8
 R9
 Aimpl
-Z13 DEx4 work 7 devices 0 22 948>WRgS3DZTlS_>UWPd=3
+Z12 DEx4 work 7 devices 0 22 948>WRgS3DZTlS_>UWPd=3
 R0
 R1
 R2
@@ -110,8 +110,8 @@ V_4HSE]SgggWW0dJ^G<6kE2
 !s100 @GgfJ`M_1AI5lZ6S:YoGD1
 R6
 33
-R12
-!i113 0
+R7
+!i113 1
 R8
 R9
 Pdev_pkg
@@ -128,8 +128,8 @@ VhdkPcHi5FW^04R`PjM4iF0
 !s100 PbAO>mge<7Lfa6_hf[WWS2
 R6
 33
-R12
-!i113 0
+R7
+!i113 1
 R8
 R9
 Edevices
@@ -146,28 +146,28 @@ V948>WRgS3DZTlS_>UWPd=3
 !s100 77>OnhPHi4`Q=bhC;PC`U1
 R6
 33
-R12
-!i113 0
+R7
+!i113 1
 R8
 R9
 Aimpl
 R10
-Z14 DEx4 work 3 ram 0 22 3D`NVl_0aMnIF0=MCFkhX3
-Z15 DEx4 work 19 serial_port_wrapper 0 22 ;jn?Aj6k3e:3HP2K:MgZg0
+Z13 DEx4 work 3 ram 0 22 3D`NVl_0aMnIF0=MCFkhX3
+Z14 DEx4 work 19 serial_port_wrapper 0 22 ;jn?Aj6k3e:3HP2K:MgZg0
 R1
 R11
 R0
 R2
 R3
-R13
+R12
 l46
 L29
 VBFl0iZWiF;?>5if9oEXLG2
 !s100 L5mLTmm_eWZoGG??fOWn13
 R6
 33
-R12
-!i113 0
+R7
+!i113 1
 R8
 R9
 Pmem_pkg
@@ -184,7 +184,7 @@ R6
 33
 b1
 R7
-!i113 0
+!i113 1
 R8
 R9
 Bbody
@@ -198,7 +198,7 @@ VLNRizXB67RN4<1AY;KKnF1
 R6
 33
 R7
-!i113 0
+!i113 1
 R8
 R9
 Eram
@@ -217,7 +217,7 @@ V3D`NVl_0aMnIF0=MCFkhX3
 R6
 33
 R7
-!i113 0
+!i113 1
 R8
 R9
 Atb
@@ -225,7 +225,7 @@ R0
 R1
 R2
 R3
-R14
+R13
 l68
 L24
 Vc0jbfe[XEL;hF8<VPQEk42
@@ -233,12 +233,12 @@ Vc0jbfe[XEL;hF8<VPQEk42
 R6
 33
 R7
-!i113 0
+!i113 1
 R8
 R9
 Eserial_port
 w0
-Z16 DPx3 std 3 env 0 22 d?`1ck@NdeD@H3RZG7FgZ2
+Z15 DPx3 std 3 env 0 22 d?`1ck@NdeD@H3RZG7FgZ2
 R1
 R2
 R3
@@ -252,15 +252,15 @@ V<G@DYGHIAc4oCid[n7CGM0
 R6
 33
 R7
-!i113 0
+!i113 1
 R8
 R9
 Aser_tb
-R16
+R15
 R1
 R2
 R3
-Z17 DEx4 work 11 serial_port 0 22 <G@DYGHIAc4oCid[n7CGM0
+Z16 DEx4 work 11 serial_port 0 22 <G@DYGHIAc4oCid[n7CGM0
 l36
 L34
 VQ^a=fNn_jDWL]`<[]57D62
@@ -268,7 +268,7 @@ VQ^a=fNn_jDWL]`<[]57D62
 R6
 33
 R7
-!i113 0
+!i113 1
 R8
 R9
 Eserial_port_wrapper
@@ -286,17 +286,17 @@ V;jn?Aj6k3e:3HP2K:MgZg0
 R6
 33
 R7
-!i113 0
+!i113 1
 R8
 R9
 Abehavior
-R16
+R15
 R1
-R17
+R16
 R0
 R2
 R3
-R15
+R14
 l41
 L29
 VF3>hh<Q8gA;TdNzYnh3XG1
@@ -304,6 +304,6 @@ VF3>hh<Q8gA;TdNzYnh3XG1
 R6
 33
 R7
-!i113 0
+!i113 1
 R8
 R9

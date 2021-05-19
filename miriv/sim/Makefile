@@ -37,7 +37,7 @@ sim:
 	@cat output.txt
 
 sim_gui:
-	@vsim $(FILE_OPT) -t ps work.tb_cpu -quiet -voptargs=+acc -do "do scripts/wave.do;run 5us;wave zoom full"
+	@vsim $(FILE_OPT) -t ps work.tb_cpu -quiet -voptargs=+acc -do "do scripts/wave.do;"
 
 
 .PHONY: all clean compile sim sim_gui
