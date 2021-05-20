@@ -46,6 +46,7 @@ begin
 	begin
 		M.wrdata <= (others => '-');
 		R <= (others => '0');
+		sign <= '0';
 		case op.memtype is
 			when MEM_B | MEM_BU =>
 			case A(1 downto 0) is

@@ -48,7 +48,7 @@ architecture rtl of exec is
 	signal aluA, aluB : data_type;
 	
 	-- pc-adder
-	signal pc_adder_input1, pc_adder_out : pc_type;
+	signal pco_next, pc_adder_input1, pc_adder_out : pc_type;
 	
 	signal mop_next : mem_op_type;
 	signal wb_next : wb_op_type;
@@ -60,7 +60,7 @@ begin
 	-- reg_write_wr
 	
 	-- 1-MUX controlling input data for ALU input A
-	aluA	<=	to_data_type(pc_old_out) when op_next.alusrc2 = '1' else
+	aluA	<=	to_data_type(pco_next) when op_next.alusrc2 = '1' else
 				op_next.readdata1;
 	
 	-- 1-MUX controlling input data for ALU input B
@@ -69,7 +69,7 @@ begin
 	
 	-- 1-MUX controlling input data for first input of PC-adder (second input is always connected to op_next.imm)
 	pc_adder_input1	<=	to_pc_type(op_next.readdata1) when op_next.alusrc3 = '1' else
-								pc_old_out;
+								pco_next;
 	
 	-- PC-adder
 	pc_adder_out <= std_logic_vector(unsigned(pc_adder_input1) + unsigned(to_pc_type(op_next.imm)));
@@ -81,12 +81,12 @@ begin
 	begin 
 		if(res_n = '0') then
 			op_next <= EXEC_NOP;
-			pc_old_out <= (others => '0');
+			pco_next <= (others => '0');
 			mop_next <= MEM_NOP;
 			wb_next <= WB_NOP;
 		elsif(rising_edge(clk)) then
 			op_next <= op;
-			pc_old_out <= pc_in;
+			pco_next <= pc_in;
 			mop_next <= memop_in;
 			wb_next <= wbop_in;
 		end if;
@@ -95,6 +95,7 @@ begin
 	async : process(all) is
 	begin
 		wrdata <= op_next.readdata2;
+		pc_old_out <= pco_next;
 		
 		if flush = '1' then -- flush: write NOPs to subsequent stage
 			memop_out <= MEM_NOP;
