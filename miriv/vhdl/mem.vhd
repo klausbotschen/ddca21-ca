@@ -51,7 +51,10 @@ end entity;
 
 architecture rtl of mem is
 	signal mem_op_next : mem_op_type;
-	signal addr : data_type;
+	signal wb_next : wb_op_type;
+	signal alu_next, wrd_next : data_type;
+	signal zero_next : std_logic;
+	signal mi_next : mem_in_type;
 begin
 	
 	-- used in exercise IV:
@@ -63,9 +66,22 @@ begin
 	begin 
 		if(res_n = '0') then
 			mem_op_next <= MEM_NOP;
+			wb_next <= WB_NOP;
+			mi_next <= MEM_IN_NOP;
+			wrd_next <= (others => '0');
+			alu_next <= (others => '0');
+			pc_new_out <= (others => '0');
+			pc_old_out <= (others => '0');
 		elsif(rising_edge(clk)) then
 			if stall = '0' then
 				mem_op_next <= mem_op;
+				wb_next <= wbop_in;
+				pc_new_out <= pc_new_in;
+				pc_old_out <= pc_old_in;
+				alu_next <= aluresult_in;
+				wrd_next <= wrdata;
+				zero_next <= zero;
+				mi_next <= mem_in;
 			else
 				mem_op_next.mem.memread <= '0';
 				mem_op_next.mem.memwrite <= '0';
@@ -77,6 +93,7 @@ begin
 	begin
 		
 		pcsrc <= '0';
+		aluresult_out <= alu_next;
 		
 		case mem_op_next.branch is
 			when BR_NOP		=>
@@ -84,38 +101,32 @@ begin
 			when BR_BR		=>
 				pcsrc <= '1';
 			when BR_CND		=>
-				if zero = '0' then pcsrc <= '1'; end if;
+				if zero_next = '0' then pcsrc <= '1'; end if;
 			when BR_CNDI	=>
 				pcsrc <= '1';
-				if zero = '1' then pcsrc <= '1'; end if;
+				if zero_next = '1' then pcsrc <= '1'; end if;
 			when others =>
 				pcsrc <= '0';
 		end case;
 		
+
 		if flush = '1' then
 			wbop_out <= WB_NOP;
-			pc_new_out <= pc_new_in;
-			pc_old_out <= pc_old_in;
-			aluresult_out <= aluresult_in;
 		else -- regular operation: tunnel through
-			wbop_out <= wbop_in;
-			pc_new_out <= pc_new_in;
-			pc_old_out <= pc_old_in;
-			aluresult_out <= aluresult_in;
+			wbop_out <= wb_next;
 		end if;
 	end process;
 	
-	memu_inst : memu
-	port map 
-	(
+	memu_inst : entity work.memu
+	port map (
 		op => mem_op_next.mem,
-		A => aluresult_in,		-- ALU calculates address
-		W => wrdata,
+		A => alu_next,		-- ALU calculates address
+		W => wrd_next,
 		R => memresult,
 		B => mem_busy,
 		XL => exc_load,
 		XS => exc_store,
-		D => mem_in,
+		D => mi_next,
 		M => mem_out
 	);
 

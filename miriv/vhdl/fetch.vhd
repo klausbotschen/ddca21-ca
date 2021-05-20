@@ -55,7 +55,7 @@ begin
 		else
 			pc_next <= std_logic_vector(unsigned(pc) + 4);
 		end if;
-		if flush = '0' then
+		if flush = '0' and res_n = '1' then
 			instr(31 downto 24) <= mem_in.rddata(7 downto 0);
 			instr(23 downto 16) <= mem_in.rddata(15 downto 8);
 			instr(15 downto 8) <= mem_in.rddata(23 downto 16);

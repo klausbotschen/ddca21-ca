@@ -78,9 +78,8 @@ begin
 	flush <= '0';
 	stall <= '1' when mem_busy_from_fetch = '1' or mem_busy_from_mem = '1' else '0';
 
-	fetch_inst : fetch
-	port map 
-	(
+	fetch_inst : entity work.fetch
+	port map (
 		clk => clk,
 		res_n => res_n,
 		stall => stall,
@@ -94,9 +93,8 @@ begin
 		mem_in => mem_i_in
 	);
 
-	decode_inst : decode
-	port map 
-	(
+	decode_inst : entity work.decode
+	port map (
 		clk => clk,
 		res_n => res_n,
 		stall => stall,
@@ -111,9 +109,8 @@ begin
 		exc_dec => exc_dec
 	);
 	
-	exec_inst : exec
-	port map 
-	(
+	exec_inst : entity work.exec
+	port map (
 		clk => clk,
 		res_n => res_n,
 		stall => stall,
@@ -134,9 +131,8 @@ begin
 		reg_write_wr => reg_write_wr
 	);
 	
-	mem_inst : mem
-	port map 
-	(
+	mem_inst : entity work.mem
+	port map (
 		clk => clk,
 		res_n => res_n,
 		stall => stall,
@@ -162,9 +158,8 @@ begin
 		exc_store => exc_store
 	);
 	
-	wb_inst : wb
-	port map 
-	(
+	wb_inst : entity work.wb
+	port map (
 		clk => clk,
 		res_n => res_n,
 		stall => stall,

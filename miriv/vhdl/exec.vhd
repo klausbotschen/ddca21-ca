@@ -50,7 +50,8 @@ architecture rtl of exec is
 	-- pc-adder
 	signal pc_adder_input1, pc_adder_out : pc_type;
 	
-	signal pc_add : pc_type;
+	signal mop_next : mem_op_type;
+	signal wb_next : wb_op_type;
 begin
 	
 	-- forwarding data and control purpose in exercise IV, not used in exercise III:
@@ -59,7 +60,7 @@ begin
 	-- reg_write_wr
 	
 	-- 1-MUX controlling input data for ALU input A
-	aluA	<=	to_data_type(pc_in) when op_next.alusrc2 = '1' else
+	aluA	<=	to_data_type(pc_old_out) when op_next.alusrc2 = '1' else
 				op_next.readdata1;
 	
 	-- 1-MUX controlling input data for ALU input B
@@ -68,41 +69,45 @@ begin
 	
 	-- 1-MUX controlling input data for first input of PC-adder (second input is always connected to op_next.imm)
 	pc_adder_input1	<=	to_pc_type(op_next.readdata1) when op_next.alusrc3 = '1' else
-								pc_in;
+								pc_old_out;
 	
 	-- PC-adder
 	pc_adder_out <= std_logic_vector(unsigned(pc_adder_input1) + unsigned(to_pc_type(op_next.imm)));
 	
 	-- hard wire LSB of PC-adder output to '0'
 	pc_new_out <= pc_adder_out and PC_MASK;
-	
+
 	sync : process(res_n, clk) is
 	begin 
 		if(res_n = '0') then
 			op_next <= EXEC_NOP;
+			pc_old_out <= (others => '0');
+			mop_next <= MEM_NOP;
+			wb_next <= WB_NOP;
 		elsif(rising_edge(clk)) then
 			op_next <= op;
+			pc_old_out <= pc_in;
+			mop_next <= memop_in;
+			wb_next <= wbop_in;
 		end if;
 	end process;
 	
 	async : process(all) is
 	begin
-		pc_old_out <= pc_in;
 		wrdata <= op_next.readdata2;
 		
 		if flush = '1' then -- flush: write NOPs to subsequent stage
 			memop_out <= MEM_NOP;
 			wbop_out <= WB_NOP;
 		else -- regular operation: tunnel through
-			memop_out <= memop_in;
-			wbop_out <= wbop_in;
+			memop_out <= mop_next;
+			wbop_out <= wb_next;
 		end if;
 	end process;
 	
-	alu_inst : alu
-	port map 
-	(
-		op => op.aluop,
+	alu_inst : entity work.alu
+	port map (
+		op => op_next.aluop,
 		A => aluA,
 		B => aluB,
 		R => aluresult,

@@ -120,6 +120,7 @@ sync: process(clk, res_n) is
 	begin
 		if res_n = '0' then
 			inst <= NOP_INST;
+			pc_out <= (others => '0');
 		elsif rising_edge(clk) then
 			if flush = '1' then
 				inst <= NOP_INST;
@@ -150,8 +151,7 @@ sync: process(clk, res_n) is
 		exec_op.alusrc2 <= '0'; -- alu A mux, 0: rs1, 1: pc (AUIPC)
 		exec_op.alusrc3 <= '0'; -- PC adder mux, 0: PC+imm, 1: rs1+imm (JALR)
 		-- note, after the PC adder bit 0 shall be hard wired to '0'!
-		mem_op.branch <= BR_NOP; -- set pcscr<='1' when branch
-		mem_op.mem <= MEMU_NOP;
+		mem_op <= MEM_NOP; -- set pcscr<='1' when branch
 		wb_op <= WB_NOP;
 		exc_dec <= '0';
 		imm <= (others => '0');
