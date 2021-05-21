@@ -8,7 +8,6 @@ modelsim.ini
 output.txt
 *.cr.mti
 *.wlf
-*.mif
 log
 db
 incremental_db

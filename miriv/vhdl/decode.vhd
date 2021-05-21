@@ -95,7 +95,7 @@ architecture rtl of decode is
 	----------------------------------------------
 
 	signal rd : reg_adr_type;
-	signal inst : instr_type;
+	signal inst : instr_type := NOP_INST;
 	signal imm, rd1, rd2 : data_type;
 
 begin

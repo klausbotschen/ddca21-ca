@@ -54,21 +54,24 @@ begin
 					M.byteena <= "1000";
 					M.wrdata(31 downto 24) <= W(7 downto 0);
 					R(7 downto 0) <= D.rddata(31 downto 24);
+					sign <= D.rddata(31);
 				when "01" =>
 					M.byteena <= "0100";
 					M.wrdata(23 downto 16) <= W(7 downto 0);
 					R(7 downto 0) <= D.rddata(23 downto 16);
+					sign <= D.rddata(23);
 				when "10" =>
 					M.byteena <= "0010";
 					M.wrdata(15 downto 8) <= W(7 downto 0);
 					R(7 downto 0) <= D.rddata(15 downto 8);
+					sign <= D.rddata(15);
 				when "11" =>
 					M.byteena <= "0001";
 					M.wrdata(7 downto 0) <= W(7 downto 0);
 					R(7 downto 0) <= D.rddata(7 downto 0);
+					sign <= D.rddata(7);
 				when others => null;
 			end case;
-			sign <= R(7);
 			if op.memtype = MEM_B then
 				R(31 downto 8) <= (others => sign);
 			end if;
@@ -81,15 +84,16 @@ begin
 					M.wrdata(23 downto 16) <= W(15 downto 8);
 					R(7 downto 0) <= D.rddata(31 downto 24);
 					R(15 downto 8) <= D.rddata(23 downto 16);
+					sign <= D.rddata(23);
 				when "10" | "11" =>
 					M.byteena <= "0011";
 					M.wrdata(15 downto 8) <= W(7 downto 0);
 					M.wrdata(7 downto 0) <= W(15 downto 8);
 					R(7 downto 0) <= D.rddata(15 downto 8);
 					R(15 downto 8) <= D.rddata(7 downto 0);
+					sign <= D.rddata(7);
 				when others => null;
 			end case;
-			sign <= R(15);
 			if op.memtype = MEM_H then
 				R(31 downto 16) <= (others => sign);
 			end if;

@@ -19,7 +19,7 @@ entity regfile is
 end entity;
 
 architecture rtl of regfile is
-	signal rda1nx, rda2nx : natural range 2**REG_BITS-1 downto 0;
+	signal rda1nx, rda2nx : natural range 2**REG_BITS-1 downto 0 := 0;
 	subtype word_t is std_logic_vector((DATA_WIDTH-1) downto 0);
 	type memory_t is array(2**REG_BITS-1 downto 0) of word_t;
 	signal ram : memory_t := (others => (others => '0'));
