@@ -62,7 +62,7 @@ begin
 			when WBS_MEM =>
 				reg_write.data <= memresult_next;
 			when WBS_OPC =>
-				reg_write.data <= to_data_type(pc_old_in_next);
+				reg_write.data <= to_data_type(std_logic_vector(unsigned(pc_old_in_next) + 4));
 		end case;
 	end process;
 	
