@@ -195,19 +195,19 @@ sync: process(clk, res_n) is
 				mem_op.branch <= BR_CND; -- pcsrc <= '1'
 				case func3 is
 					when "000" => -- BEQ rs1,rs2,imm
-						exec_op.aluop <= ALU_SUB; -- jump when Z = '0'
-					when "001" => -- BNE rs1,rs2,imm
-						mem_op.branch <= BR_CNDI;
 						exec_op.aluop <= ALU_SUB; -- jump when Z = '1'
+					when "001" => -- BNE rs1,rs2,imm
+						exec_op.aluop <= ALU_SUB; -- jump when Z = '0'
+						mem_op.branch <= BR_CNDI;
 					when "100" => -- BLT rs1,rs2,imm (signed)
 						exec_op.aluop <= ALU_SLT; -- jump when Z = '0'
-					when "101" => -- BGE rs1,rs2,imm (signed)
 						mem_op.branch <= BR_CNDI;
+					when "101" => -- BGE rs1,rs2,imm (signed)
 						exec_op.aluop <= ALU_SLT; -- jump when Z = '1'
 					when "110" => -- BLTU rs1,rs2,imm (unsigned)
 						exec_op.aluop <= ALU_SLTU; -- jump when Z = '0'
-					when "111" => -- BGEU rs1,rs2,imm (unsigned)
 						mem_op.branch <= BR_CNDI;
+					when "111" => -- BGEU rs1,rs2,imm (unsigned)
 						exec_op.aluop <= ALU_SLTU; -- jump when Z = '1'
 					when others =>
 						exc_dec <= '1';
