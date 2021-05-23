@@ -10,13 +10,13 @@ add wave -noupdate -expand /tb/mem_inst/wbop_in
 add wave -noupdate -radix hexadecimal /tb/mem_inst/pc_new_in
 add wave -noupdate -radix hexadecimal /tb/mem_inst/pc_old_in
 add wave -noupdate -radix hexadecimal /tb/mem_inst/aluresult_in
-add wave -noupdate -radix hexadecimal /tb_cpu/dut/pipeline_inst/mem_inst/wrdata
+add wave -noupdate -radix hexadecimal /tb/mem_inst/wrdata
 add wave -noupdate /tb/mem_inst/zero
 add wave -noupdate -divider Output
 add wave -noupdate /tb/mem_inst/mem_busy
-add wave -noupdate /tb_cpu/mem_inst/reg_write
+add wave -noupdate /tb/mem_inst/reg_write
 add wave -noupdate -radix hexadecimal /tb/mem_inst/pc_new_out
-add wave -noupdate /tb_cpu/mem_inst/pcsrc
+add wave -noupdate /tb/mem_inst/pcsrc
 add wave -noupdate -expand /tb/mem_inst/wbop_out
 add wave -noupdate -radix hexadecimal /tb/mem_inst/pc_old_out
 add wave -noupdate -radix hexadecimal /tb/mem_inst/aluresult_out

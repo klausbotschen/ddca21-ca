@@ -90,11 +90,11 @@ architecture bench of tb is
 		result.mem_op.mem.memtype := str_to_mem_op(l.all);
 
 		l := get_next_valid_line(f);
-		result.wb_op_in.rd := bin_to_slv(l.all, REG_BITS);
+		result.wbop_in.rd := bin_to_slv(l.all, REG_BITS);
 		l := get_next_valid_line(f);
-		result.wb_op_in.write := str_to_sl(l(1));
+		result.wbop_in.write := str_to_sl(l(1));
 		l := get_next_valid_line(f);
-		result.wb_op_in.src := str_to_wbs_op(l.all);
+		result.wbop_in.src := str_to_wbs_op(l.all);
 
 		l := get_next_valid_line(f);
 		result.pc_new_in := hex_to_slv(l.all, PC_WIDTH);
@@ -140,11 +140,11 @@ architecture bench of tb is
 		result.pcsrc := str_to_sl(l(1));
 
 		l := get_next_valid_line(f);
-		result.wb_op_out.rd := bin_to_slv(l.all, REG_BITS);
+		result.wbop_out.rd := bin_to_slv(l.all, REG_BITS);
 		l := get_next_valid_line(f);
-		result.wb_op_out.write := str_to_sl(l(1));
+		result.wbop_out.write := str_to_sl(l(1));
 		l := get_next_valid_line(f);
-		result.wb_op_out.src := str_to_wbs_op(l.all);
+		result.wbop_out.src := str_to_wbs_op(l.all);
 
 		l := get_next_valid_line(f);
 		result.pc_old_out := hex_to_slv(l.all, PC_WIDTH);
@@ -155,6 +155,7 @@ architecture bench of tb is
 		l := get_next_valid_line(f);
 		result.memresult := bin_to_slv(l.all, DATA_WIDTH);
 
+		l := get_next_valid_line(f);
 		result.mem_out.address := bin_to_slv(l.all, ADDR_WIDTH);
 		l := get_next_valid_line(f);
 		result.mem_out.rd := str_to_sl(l(1));
@@ -179,26 +180,71 @@ architecture bench of tb is
 	begin
 		passed := (outp = output_ref);
 
+		report " << input :"
+			& " stall=" & to_string(inp.stall)
+			& " flush=" & to_string(inp.flush)
+			& " mem_op {branch=" & to_string(inp.mem_op.branch)
+			& " mem.memread=" & to_string(inp.mem_op.mem.memread)
+			& " mem.memwrite=" & to_string(inp.mem_op.mem.memwrite)
+			& " mem.memtype=" & to_string(inp.mem_op.mem.memtype)
+			& "} wbop_in {rd=" & to_string(inp.wbop_in.rd)
+			& " write=" & to_string(inp.wbop_in.write)
+			& " src=" & to_string(inp.wbop_in.src)
+			& "} pc_new_in=" & to_string(inp.pc_new_in)
+			& " pc_old_in=" & to_string(inp.pc_old_in)
+			& " aluresult_in=" & to_string(inp.aluresult_in)
+			& " wrdata=" & to_string(inp.wrdata)
+			& " zero=" & to_string(inp.zero)
+			& " mem_in {busy=" & to_string(inp.mem_in.busy)
+			& " rddata=" & to_string(inp.mem_in.rddata)
+			& " }"
+			& lf severity note;
+		report " >> output  :"
+			& " mem_busy=" & to_string(outp.mem_busy)
+			& " reg_write {write=" & to_string(outp.reg_write.write)
+			& " reg=" & to_string(outp.reg_write.reg)
+			& " data=" & to_string(outp.reg_write.data)
+			& "} pc_new_out=" & to_string(outp.pc_new_out)
+			& " pcsrc=" & to_string(outp.pcsrc)
+			& " wbop_out {rd=" & to_string(outp.wbop_out.rd)
+			& " write=" & to_string(outp.wbop_out.write)
+			& " src=" & to_string(outp.wbop_out.src)
+			& "} pc_old_out=" & to_string(outp.pc_old_out)
+			& " aluresult_out=" & to_string(outp.aluresult_out)
+			& " memresult=" & to_string(outp.memresult)
+			& " mem_out {address=" & to_string(outp.mem_out.address)
+			& " rd=" & to_string(outp.mem_out.rd)
+			& " wr=" & to_string(outp.mem_out.wr)
+			& " byteena=" & to_string(outp.mem_out.byteena)
+			& " wrdata=" & to_string(outp.mem_out.wrdata)
+			& "} exc_load=" & to_string(outp.exc_load)
+			& " exc_store=" & to_string(outp.exc_store)
+			& lf severity note;
+
 		if passed then
-			report " PASSED: "
-			& "stall="     & to_string(inp.stall)
-			& " rdaddr1="  & to_string(inp.rdaddr1)
-			& " rdaddr2="  & to_string(inp.rdaddr2)
-			& " wraddr="   & to_string(inp.wraddr)
-			& " wrdata="   & to_string(inp.wrdata)
-			& " regwrite=" & to_string(inp.regwrite) & lf
-			severity note;
+			report " >> PASSED!" severity note;
 		else
-			report "FAILED: "
-			& "stall="     & to_string(inp.stall)
-			& " rdaddr1="  & to_string(inp.rdaddr1)
-			& " rdaddr2="  & to_string(inp.rdaddr2)
-			& " wraddr="   & to_string(inp.wraddr)
-			& " wrdata="   & to_string(inp.wrdata)
-			& " regwrite=" & to_string(inp.regwrite) & lf
-			& "**     expected: rddata1=" & to_string(output_ref.rddata1) & " rddata2=" & to_string(output_ref.rddata2) & lf
-			& "**     actual:   rddata1=" & to_string(outp.rddata1)       & " rddata2=" & to_string(outp.rddata2) & lf
-			severity error;
+			report ">> EXPECTED:"
+			& " mem_busy=" & to_string(output_ref.mem_busy)
+			& " reg_write {write=" & to_string(output_ref.reg_write.write)
+			& " reg=" & to_string(output_ref.reg_write.reg)
+			& " data=" & to_string(output_ref.reg_write.data)
+			& "} pc_new_out=" & to_string(output_ref.pc_new_out)
+			& " pcsrc=" & to_string(output_ref.pcsrc)
+			& " wbop_out {rd=" & to_string(output_ref.wbop_out.rd)
+			& " write=" & to_string(output_ref.wbop_out.write)
+			& " src=" & to_string(output_ref.wbop_out.src)
+			& "} pc_old_out=" & to_string(output_ref.pc_old_out)
+			& " aluresult_out=" & to_string(output_ref.aluresult_out)
+			& " memresult=" & to_string(output_ref.memresult)
+			& " mem_out {address=" & to_string(output_ref.mem_out.address)
+			& " rd=" & to_string(output_ref.mem_out.rd)
+			& " wr=" & to_string(output_ref.mem_out.wr)
+			& " byteena=" & to_string(output_ref.mem_out.byteena)
+			& " wrdata=" & to_string(output_ref.mem_out.wrdata)
+			& "} exc_load=" & to_string(output_ref.exc_load)
+			& " exc_store=" & to_string(output_ref.exc_store)
+			& lf severity error;
 		end if;
 	end procedure;
 
