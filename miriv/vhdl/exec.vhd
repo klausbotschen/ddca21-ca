@@ -85,10 +85,12 @@ begin
 			mop_next <= MEM_NOP;
 			wb_next <= WB_NOP;
 		elsif(rising_edge(clk)) then
-			op_next <= op;
-			pco_next <= pc_in;
-			mop_next <= memop_in;
-			wb_next <= wbop_in;
+			if stall = '0' then
+				op_next <= op;
+				pco_next <= pc_in;
+				mop_next <= memop_in;
+				wb_next <= wbop_in;
+			end if;
 		end if;
 	end process;
 	

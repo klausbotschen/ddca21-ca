@@ -99,7 +99,7 @@ architecture bench of tb is
 		result.op.imm := hex_to_slv(l.all, DATA_WIDTH);
 
 		l := get_next_valid_line(f);
-		result.pc_in := bin_to_slv(l.all, PC_WIDTH);
+		result.pc_in := hex_to_slv(l.all, PC_WIDTH);
 
 		l := get_next_valid_line(f);
 		result.mem_op_in.branch := str_to_branch_op(l.all);
@@ -139,10 +139,10 @@ architecture bench of tb is
 		variable result : output_t;
 	begin
 		l := get_next_valid_line(f);
-		result.pc_old_out := bin_to_slv(l.all, PC_WIDTH);
+		result.pc_old_out := hex_to_slv(l.all, PC_WIDTH);
 
 		l := get_next_valid_line(f);
-		result.pc_new_out := bin_to_slv(l.all, PC_WIDTH);
+		result.pc_new_out := hex_to_slv(l.all, PC_WIDTH);
 
 		l := get_next_valid_line(f);
 		result.aluresult := hex_to_slv(l.all, DATA_WIDTH);
