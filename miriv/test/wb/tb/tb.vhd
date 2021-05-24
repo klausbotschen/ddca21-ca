@@ -70,10 +70,10 @@ architecture bench of tb is
 		result.op.src := str_to_wbs_op(l.all);
 
 		l := get_next_valid_line(f);
-		result.aluresult := bin_to_slv(l.all, DATA_WIDTH);
+		result.aluresult := hex_to_slv(l.all, DATA_WIDTH);
 
 		l := get_next_valid_line(f);
-		result.memresult := bin_to_slv(l.all, DATA_WIDTH);
+		result.memresult := hex_to_slv(l.all, DATA_WIDTH);
 
 		l := get_next_valid_line(f);
 		result.pc_old_in := hex_to_slv(l.all, PC_WIDTH);
