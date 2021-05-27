@@ -29,7 +29,7 @@ architecture rtl of memu is
 	signal sign : std_logic;
 begin
 
-	B <= D.busy;
+	B <= D.busy or op.memread;
 
 	adex <= '1' when (A(0) = '1' and
 		(op.memtype = MEM_H or op.memtype = MEM_HU)) or

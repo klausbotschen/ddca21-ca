@@ -52,7 +52,7 @@ end entity;
 architecture rtl of mem is
 	signal mem_op_next : mem_op_type;
 	signal wb_next : wb_op_type;
-	signal alu_next : data_type;
+	signal wrdata_next, alu_next : data_type;
 	signal zero_next : std_logic;
 begin
 	
@@ -67,6 +67,7 @@ begin
 			mem_op_next <= MEM_NOP;
 			wb_next <= WB_NOP;
 			alu_next <= (others => '0');
+			wrdata_next <= (others => '0');
 			pc_new_out <= (others => '0');
 			pc_old_out <= (others => '0');
 		elsif(rising_edge(clk)) then
@@ -75,6 +76,7 @@ begin
 				wb_next <= wbop_in;
 				pc_new_out <= pc_new_in;
 				pc_old_out <= pc_old_in;
+				wrdata_next <= wrdata;
 				alu_next <= aluresult_in;
 				zero_next <= zero;
 			else
@@ -112,31 +114,17 @@ begin
 	end process;
 	
 	-- memory is clocked
-	memu_inst_w : entity work.memu
-	port map (
-		op => mem_op.mem,
-		A => aluresult_in,		-- ALU calculates address
-		W => wrdata,
-		R => open,
-		B => open,
-		XL => open,
-		XS => exc_store,
-		D => MEM_IN_NOP,
-		M => mem_out     -- TODO: clear rd/wr on stall
-	);
-	
-	-- read result after rising edge
-	memu_inst_r : entity work.memu
+	memu_inst : entity work.memu
 	port map (
 		op => mem_op_next.mem,
-		A => alu_next,
-		W => (others => '0'),
+		A => alu_next,		-- ALU calculates address
+		W => wrdata_next,
 		R => memresult,
 		B => mem_busy,
 		XL => exc_load,
-		XS => open,
+		XS => exc_store,
 		D => mem_in,
-		M => open
+		M => mem_out
 	);
 
 end architecture;
