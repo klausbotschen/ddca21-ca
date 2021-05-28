@@ -29,8 +29,6 @@ architecture rtl of memu is
 	signal sign : std_logic;
 begin
 
-	B <= D.busy or op.memread;
-
 	adex <= '1' when (A(0) = '1' and
 		(op.memtype = MEM_H or op.memtype = MEM_HU)) or
 		(op.memtype = MEM_W and (A(0) = '1' or A(1) = '1')) else '0';
@@ -41,6 +39,7 @@ begin
 	M.rd <= op.memread and not adex;
 	M.wr <= op.memwrite and not adex;
 	M.address <= A(15 downto 2);
+	B <= D.busy or M.rd;
 
 	sq_p : process(all)
 	begin
