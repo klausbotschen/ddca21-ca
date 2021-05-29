@@ -1,4 +1,21 @@
-# after first clk, pc_out 0, mem addr 1
+# mem_busy
+# pc_out
+# instr
+# mem_out.address
+# mem_out.rd, mem_out.wr, mem_out.byteena
+# mem_out.wrdata
+
+# initial state, first instruction fetch
+0
+1111111111111100
+00000000 00000000 00000000 00000000
+00000000000000
+1
+0
+1111
+00000000000000000000000000000000
+
+# first instruction here, 2nd fetch
 0
 0000000000000000
 01000100 00110011 00100010 00010001
