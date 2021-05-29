@@ -25,10 +25,7 @@ add wave -noupdate -group decode -expand /tb_cpu/dut/pipeline_inst/decode_inst/w
 add wave -noupdate -group decode -radix hexadecimal /tb_cpu/dut/pipeline_inst/decode_inst/pc_out
 add wave -noupdate -group decode /tb_cpu/dut/pipeline_inst/decode_inst/exc_dec
 add wave -noupdate -divider -height 40 regfile
-add wave -noupdate -group regfile -radix hexadecimal /tb_cpu/dut/pipeline_inst/decode_inst/regfile_inst/ram(4)
-add wave -noupdate -group regfile -radix hexadecimal /tb_cpu/dut/pipeline_inst/decode_inst/regfile_inst/ram(5)
-add wave -noupdate -group regfile -radix hexadecimal /tb_cpu/dut/pipeline_inst/decode_inst/regfile_inst/ram(6)
-add wave -noupdate -group regfile -radix hexadecimal /tb_cpu/dut/pipeline_inst/decode_inst/regfile_inst/ram(7)
+add wave -noupdate -group regfile -radix hexadecimal /tb_cpu/dut/pipeline_inst/decode_inst/regfile_inst/ram
 add wave -noupdate -divider -height 40 exec
 add wave -noupdate -group exec /tb_cpu/dut/pipeline_inst/exec_inst/stall
 add wave -noupdate -group exec /tb_cpu/dut/pipeline_inst/exec_inst/flush

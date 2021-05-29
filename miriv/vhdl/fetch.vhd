@@ -50,10 +50,14 @@ begin
 
 	async: process(all) is
 	begin
-		if pcsrc = '1' and stall = '0' then
-			pc_next <= pc_in;
+		if stall ='0' then
+			if pcsrc = '1' then
+				pc_next <= pc_in;
+			else
+				pc_next <= std_logic_vector(unsigned(pc) + 4);
+			end if;
 		else
-			pc_next <= std_logic_vector(unsigned(pc) + 4);
+			pc_next <= pc;
 		end if;
 		if flush = '0' and res_n = '1' then
 			instr(31 downto 24) <= mem_in.rddata(7 downto 0);
