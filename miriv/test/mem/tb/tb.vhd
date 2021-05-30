@@ -103,10 +103,10 @@ architecture bench of tb is
 		result.pc_old_in := hex_to_slv(l.all, PC_WIDTH);
 
 		l := get_next_valid_line(f);
-		result.aluresult_in := bin_to_slv(l.all, DATA_WIDTH);
+		result.aluresult_in := hex_to_slv(l.all, DATA_WIDTH);
 
 		l := get_next_valid_line(f);
-		result.wrdata := bin_to_slv(l.all, DATA_WIDTH);
+		result.wrdata := bin_to_slv(l.all, DATA_WIDTH); -- use bin here as well as at output
 
 		l := get_next_valid_line(f);
 		result.zero := str_to_sl(l(1));
@@ -114,7 +114,7 @@ architecture bench of tb is
 		l := get_next_valid_line(f);
 		result.mem_in.busy := str_to_sl(l(1));
 		l := get_next_valid_line(f);
-		result.mem_in.rddata := bin_to_slv(l.all, DATA_WIDTH);
+		result.mem_in.rddata := hex_to_slv(l.all, DATA_WIDTH);
 
 		return result;
 	end function;
@@ -150,10 +150,10 @@ architecture bench of tb is
 		result.pc_old_out := hex_to_slv(l.all, PC_WIDTH);
 
 		l := get_next_valid_line(f);
-		result.aluresult_out := bin_to_slv(l.all, DATA_WIDTH);
+		result.aluresult_out := hex_to_slv(l.all, DATA_WIDTH);
 
 		l := get_next_valid_line(f);
-		result.memresult := bin_to_slv(l.all, DATA_WIDTH);
+		result.memresult := hex_to_slv(l.all, DATA_WIDTH);
 
 		l := get_next_valid_line(f);
 		result.mem_out.address := bin_to_slv(l.all, ADDR_WIDTH);
@@ -164,7 +164,7 @@ architecture bench of tb is
 		l := get_next_valid_line(f);
 		result.mem_out.byteena := bin_to_slv(l.all, BYTEEN_WIDTH);
 		l := get_next_valid_line(f);
-		result.mem_out.wrdata := bin_to_slv(l.all, DATA_WIDTH);
+		result.mem_out.wrdata := bin_to_slv(l.all, DATA_WIDTH); -- use bin here to parse '-'
 
 		l := get_next_valid_line(f);
 		result.exc_load := str_to_sl(l(1));
