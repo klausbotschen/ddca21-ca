@@ -28,19 +28,22 @@ end entity;
 
 architecture rtl of fetch is
 	signal pc, pc_next : pc_type;
+	signal init : std_logic := '1';
 begin
 	sync: process(clk, res_n) is
 	begin
 		if res_n = '0' then
 			pc <= x"fffc";
+			init <= '1';
 		elsif rising_edge(clk) then
+			init <= '0';
 			if stall = '0' then
 				pc <= pc_next;
 			end if;
 		end if;
 	end process;
 
-	pc_out <= pc;
+	with init select pc_out <= pc when '0', (others => '0') when others;
 	mem_out.address <= pc_next(pc_next'high downto 2);
 	mem_out.rd <= '1';
 	mem_out.wr <= '0';
@@ -59,7 +62,7 @@ begin
 		else
 			pc_next <= pc;
 		end if;
-		if flush = '0' and res_n = '1' then
+		if flush = '0' and init = '0' then
 			instr(31 downto 24) <= mem_in.rddata(7 downto 0);
 			instr(23 downto 16) <= mem_in.rddata(15 downto 8);
 			instr(15 downto 8) <= mem_in.rddata(23 downto 16);
