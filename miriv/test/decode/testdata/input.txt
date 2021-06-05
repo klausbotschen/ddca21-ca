@@ -1,3 +1,6 @@
+# stall, flush, pc_in
+# instr, reg_write {write, reg, data}
+
 # NOP
 0
 0

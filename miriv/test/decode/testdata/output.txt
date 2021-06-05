@@ -1,3 +1,10 @@
+# pc_out
+# exec_op { aluop, alusrc1, alusrc2, alusrc3,
+#   rs1, rs2, readdata1, readdata2, imm},
+# mem_op {branch, mem {memread, memwrite, memtype}
+# wb_op {rd, write, src}
+# exc_dec
+
 # NOP
 0000
 ALU_ADD

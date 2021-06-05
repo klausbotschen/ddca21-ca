@@ -27,7 +27,8 @@ entity fetch is
 end entity;
 
 architecture rtl of fetch is
-	signal pc, pc_next : pc_type;
+	signal pc : pc_type;
+	signal pc_next : pc_type := (others => '0');
 	signal init : std_logic := '1';
 begin
 	sync: process(clk, res_n) is

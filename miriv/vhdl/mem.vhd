@@ -70,6 +70,7 @@ begin
 			wrdata_next <= (others => '0');
 			pc_new_out <= (others => '0');
 			pc_old_out <= (others => '0');
+			zero_next <= '-';
 		elsif(rising_edge(clk)) then
 			if stall = '0' then
 				mem_op_next <= mem_op;
