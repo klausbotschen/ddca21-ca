@@ -55,9 +55,7 @@ architecture rtl of exec is
 begin
 	
 	-- forwarding data and control purpose in exercise IV, not used in exercise III:
-	exec_op <= EXEC_NOP;
-	-- reg_write_mem
-	-- reg_write_wr
+	exec_op <= op_next;
 	
 	-- 1-MUX controlling input data for ALU input A
 	aluA	<=	to_data_type(pco_next) when op_next.alusrc2 = '1' else

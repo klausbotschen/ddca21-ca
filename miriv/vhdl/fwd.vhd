@@ -22,4 +22,20 @@ end entity;
 
 architecture rtl of fwd is
 begin
+	
+	async : process(all) is
+		-- Declaration(s)
+	begin
+		val <= (others => '0');
+		do_fwd <= '0';
+		
+		if reg = reg_write_mem.reg and reg_write_mem.write = '1' then
+			val <= reg_write_mem.data;
+			do_fwd <= '1';
+		elsif reg = reg_write_wb.reg and reg_write_wb.write = '1' then
+			val <= reg_write_wb.data;
+			do_fwd <= '1';
+		end if;
+	end process;
+	
 end architecture;

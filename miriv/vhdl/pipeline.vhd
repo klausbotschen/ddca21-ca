@@ -67,14 +67,6 @@ architecture impl of pipeline is
 	
 begin
 	
-	-- used in exercise IV:
-	reg_write_mem.write <= '0';
-	reg_write_mem.reg <= (others => '0');
-	reg_write_mem.data <= (others => '0');
-	reg_write_wr.write <= '0';
-	reg_write_wr.reg <= (others => '0');
-	reg_write_wr.data <= (others => '0');
-	
 	flush <= '0';
 	stall <= '1' when mem_busy_from_fetch = '1' or mem_busy_from_mem = '1' else '0';
 
@@ -169,6 +161,24 @@ begin
 		memresult => memresult,
 		pc_old_in => pc_old_from_mem,
 		reg_write => reg_write_from_wb
+	);
+	
+	fwd_inst1 : entity work.fwd
+	port map (
+		reg_write_mem => reg_write_from_mem,
+		reg_write_wb => reg_write_from_wb,
+		reg => exec_op.rs1, -- TODO
+		val => reg_write_mem.data,
+		do_fwd => reg_write_mem.write
+	);
+	
+	fwd_inst2 : entity work.fwd
+	port map (
+		reg_write_mem => reg_write_from_mem,
+		reg_write_wb => reg_write_from_wb,
+		reg => exec_op.rs1, -- TODO
+		val => reg_write_wr.data,
+		do_fwd => reg_write_wr.write
 	);
 
 end architecture;
