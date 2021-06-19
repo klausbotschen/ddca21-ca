@@ -54,12 +54,20 @@ architecture rtl of mem is
 	signal wb_next : wb_op_type;
 	signal wrdata_next, alu_next : data_type;
 	signal zero_next : std_logic;
+	signal memres : data_type;
+	signal pc_old_in_next : pc_type;
 begin
 	
-	-- used in exercise IV:
-	reg_write.write <= '0';
-	reg_write.reg <= (others => '0');
-	reg_write.data <= (others => '0');
+	-- fwd:
+	reg_write.write <= wb_next.write;
+	reg_write.reg <= wb_next.rd;
+	reg_write.data <= 
+	alu_next when wb_next.src = WBS_ALU else
+	memres when wb_next.src = WBS_MEM else
+	to_data_type(std_logic_vector(unsigned(pc_old_in_next) + 4));
+	
+	memresult <= memres;
+	pc_old_out <= pc_old_in_next;
 	
 	sync : process(res_n, clk) is 
 	begin 
@@ -69,14 +77,13 @@ begin
 			alu_next <= (others => '0');
 			wrdata_next <= (others => '0');
 			pc_new_out <= (others => '0');
-			pc_old_out <= (others => '0');
 			zero_next <= '-';
 		elsif(rising_edge(clk)) then
 			if stall = '0' then
 				mem_op_next <= mem_op;
 				wb_next <= wbop_in;
 				pc_new_out <= pc_new_in;
-				pc_old_out <= pc_old_in;
+				pc_old_in_next <= pc_old_in;
 				wrdata_next <= wrdata;
 				alu_next <= aluresult_in;
 				zero_next <= zero;
@@ -120,7 +127,7 @@ begin
 		op => mem_op_next.mem,
 		A => alu_next,		-- ALU calculates address
 		W => wrdata_next,
-		R => memresult,
+		R => memres,
 		B => mem_busy,
 		XL => exc_load,
 		XS => exc_store,

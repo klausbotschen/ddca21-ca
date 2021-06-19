@@ -30,16 +30,22 @@ architecture impl of pipeline is
 	signal stall : std_logic;
 	signal flush : std_logic;
 	
+	signal stall_fetch : std_logic;
+	signal flush_fetch : std_logic;
 	signal mem_busy_from_fetch : std_logic;
 	signal pc_from_fetch : pc_type;
 	signal instr : instr_type;
 	
+	signal stall_dec : std_logic;
+	signal flush_dec : std_logic;
 	signal pc_from_decode : pc_type;
 	signal execop_from_decode : exec_op_type;
 	signal memop_from_decode : mem_op_type;
 	signal wbop_from_decode : wb_op_type;
 	signal exc_dec : std_logic;
 	
+	signal stall_exec : std_logic;
+	signal flush_exec : std_logic;
 	signal pc_old_from_exec : pc_type;
 	signal pc_new_from_exec : pc_type;
 	signal aluresult_from_exec : data_type;
@@ -49,6 +55,8 @@ architecture impl of pipeline is
 	signal wbop_from_exec : wb_op_type;
 	signal exec_op : exec_op_type;
 	
+	signal stall_mem : std_logic;
+	signal flush_mem : std_logic;
 	signal mem_busy_from_mem : std_logic;
 	signal reg_write_from_mem : reg_write_type;
 	signal pc_new_from_mem : pc_type;
@@ -60,6 +68,8 @@ architecture impl of pipeline is
 	signal exc_load : std_logic;
 	signal exc_store : std_logic;
 	
+	signal stall_wb : std_logic;
+	signal flush_wb : std_logic;
 	signal reg_write_from_wb : reg_write_type;
 	
 	signal reg_write_mem : reg_write_type;
@@ -67,6 +77,7 @@ architecture impl of pipeline is
 	
 begin
 	
+	-- exercise III:
 	flush <= '0';
 	stall <= '1' when mem_busy_from_fetch = '1' or mem_busy_from_mem = '1' else '0';
 
@@ -167,18 +178,41 @@ begin
 	port map (
 		reg_write_mem => reg_write_from_mem,
 		reg_write_wb => reg_write_from_wb,
-		reg => exec_op.rs1, -- TODO
+		reg => exec_op.rs1,
 		val => reg_write_mem.data,
 		do_fwd => reg_write_mem.write
 	);
+	reg_write_mem.reg <= exec_op.rs1;
 	
 	fwd_inst2 : entity work.fwd
 	port map (
 		reg_write_mem => reg_write_from_mem,
 		reg_write_wb => reg_write_from_wb,
-		reg => exec_op.rs1, -- TODO
+		reg => exec_op.rs2,
 		val => reg_write_wr.data,
 		do_fwd => reg_write_wr.write
 	);
+	reg_write_wr.reg <= exec_op.rs2;
+	
+--	ctrl_inst : entity work.ctrl_inst
+--	port map (
+--		clk => clk;
+--		res_n => res_n;
+--		stall => ;
+--		stall_fetch => stall_fetch;
+--		stall_dec => stall_dec;
+--		stall_exec => stall_exec;
+--		stall_mem => stall_mem;
+--		stall_wb => stall_wb;
+--		flush_fetch => flush_fetch;
+--		flush_dec => flush_dec;
+--		flush_exec => flush_exec;
+--		flush_mem => flush_mem;
+--		flush_wb => flush_wb;
+--		wb_op_exec => ;
+--		exec_op_dec => ;
+--		pcsrc_in => ;
+--		pcsrc_out => 
+--	);
 
 end architecture;

@@ -34,4 +34,38 @@ end entity;
 
 architecture rtl of ctrl is
 begin
+	
+--	sync : process(all) is
+--		-- Declaration(s)
+--	begin
+--		if res_n = '0' then
+--			
+--		elsif rising_edge(clk) then
+--			state <= state_next;
+--			state_next <= state;
+--			
+--			if
+--			if
+--		else;
+--	end process;
+--	
+--	async : process(all) is
+--		-- Declaration(s)
+--	begin
+--		case state is
+--		when STATE_FLUSH_BRANCH_HI =>
+--			flush_fetch <=  '1';
+--			flush_dec <=  '1';
+--			flush_exec <=  '1';
+--		when STATE_FLUSH_BRANCH_LO =>
+--			flush_fetch <=  '0';
+--			flush_dec <=  '0';
+--			flush_exec <=  '0';
+--		when others =>
+--			flush_fetch <=  '0';
+--			flush_dec <=  '0';
+--			flush_exec <=  '0';
+--		end case;
+--	end process;
+	
 end architecture;
