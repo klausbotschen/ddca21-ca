@@ -45,16 +45,17 @@ begin
 	begin
 		rddata1 <= ram(rda1nx);
 		rddata2 <= ram(rda2nx);
+		-- check for reg 0 and write through
 		if rda1nx = 0 then
 			rddata1 <= (others => '0');
 		elsif rda1nx = to_integer(unsigned(wraddr))
-				and stall = '0' then
+				and stall = '0' and regwrite = '1' then
 			rddata1 <= wrdata;
 		end if;
 		if rda2nx = 0 then
 			rddata2 <= (others => '0');
 		elsif rda2nx = to_integer(unsigned(wraddr))
-				and stall = '0' then
+				and stall = '0' and regwrite = '1' then
 			rddata2 <= wrdata;
 		end if;
 	end process;
