@@ -31,5 +31,28 @@ entity mgmt_st is
 end entity;
 
 architecture impl of mgmt_st is
+	signal entry_w, entry_r : c_mgmt_info;
 begin
+	storage_inst : entity work.mgmt_st_1w(impl)
+		generic map (
+			SETS_LD => SETS_LD
+		)
+		port map (
+			clk     => clk,
+			res_n   => res_n,
+			index   => index,
+			we      => wr,
+			we_repl	=> wr,
+			mgmt_info_in  => entry_w,
+			mgmt_info_out => entry_r
+		);
+	way_out <= (others => '0');
+	entry_w.valid <= valid_in;
+	entry_w.dirty <= dirty_in;
+	entry_w.replace <= '0';
+	entry_w.tag <= tag_in;
+	valid_out <= entry_r.valid;
+	dirty_out <= entry_r.dirty;
+	tag_out <= entry_r.tag;
+	hit_out <= '1' when rd = '1' and tag_in = tag_out else '0';
 end architecture;

@@ -25,4 +25,23 @@ end entity;
 
 architecture impl of data_st_1w is
 begin
+
+	-- each SRAM instance is used for one byte
+
+	CACHE: for i in 3 downto 0 generate
+		CBYTE : single_clock_rw_ram
+		generic map (
+			ADDR_WIDTH => SETS_LD,
+			DATA_WIDTH => 8
+		)
+		port map (
+			clk => clk,
+			data_in => data_in(8*(i+1)-1 downto 8*i),
+			write_address => index,
+			read_address => index,
+			we => we and byteena(i),
+			data_out => data_out(8*(i+1)-1 downto 8*i)
+		);
+	end generate;
+
 end architecture;

@@ -10,11 +10,11 @@ memory:
 	.align	2
 	.globl	_start
 _start:
-	lui	x4, %hi(memory)  # 0x00000437
+	lui	x4, %hi(memory)  # 0x00000237
 	nop
 	nop
 	nop
-	addi x4, x0, %lo(memory) # 0x02840213
+	addi x4, x0, %lo(memory) # 0x06C00213
 	addi x5, x0, 0x10   # lim, 0x10000293
 	addi x6, x0, 0      # cnt, 0x00000313
 	nop
