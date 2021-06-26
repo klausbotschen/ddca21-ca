@@ -54,5 +54,8 @@ begin
 	valid_out <= entry_r.valid;
 	dirty_out <= entry_r.dirty;
 	tag_out <= entry_r.tag;
-	hit_out <= '1' when rd = '1' and tag_in = tag_out else '0';
+	hit_out <= '1' when (rd = '1' or wr = '1')
+				and entry_r.valid = '1'
+				and tag_in = tag_out
+				else '0';
 end architecture;

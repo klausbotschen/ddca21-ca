@@ -46,20 +46,65 @@ begin
 		variable fstatus: file_open_status;
 	begin
 		res_n <= '0';
+		mco <= MEM_OUT_NOP;
+		mmi <= MEM_IN_NOP;
 		wait until rising_edge(clk);
 		res_n <= '1';
 
-		mco.address <= (others => '0');
+		-- 1. read, cache miss
+		mco.address <= 14x"00E0";
 		mco.rd <= '1';
 		mco.wr <= '0';
 		mco.byteena <= "1111";
-		mco.wrdata <= (others => '0');
-
-		mmi.busy <= '0';
-		mmi.rddata <= (others => '0');
+		mco.wrdata <= x"00000000";
 
 		wait until rising_edge(clk);
+		mco.rd <= '0';
+		wait until rising_edge(clk);
+		mmi.busy <= '1';
+		wait until rising_edge(clk);
+		wait until rising_edge(clk);
+		mmi.busy <= '0';
+		mmi.rddata <= x"33445566";
+		wait until rising_edge(clk);
+		wait until rising_edge(clk);
 		
+		-- 2. read, cache hit
+		mco.rd <= '1';
+		wait until rising_edge(clk);
+		mco.rd <= '0';
+		wait until rising_edge(clk);
+		wait until rising_edge(clk);
+		
+		-- 3. write, cache miss
+		mco.address <= 14x"00F0";
+		mco.wr <= '1';
+		wait until rising_edge(clk);
+		mco.wr <= '0';
+		wait until rising_edge(clk);
+		
+		-- 4. write, cache hit
+		mco.address <= 14x"00E0";
+		mco.wr <= '1';
+		wait until rising_edge(clk);
+		mco.wr <= '0';
+		wait until rising_edge(clk);
+		
+		-- 5. read, cache miss + dirty = wb
+		mco.address <= 14x"00F0";
+		mco.rd <= '1';
+		wait until rising_edge(clk);
+		mco.rd <= '0';
+		wait until rising_edge(clk);
+		mmi.busy <= '1';
+		wait until rising_edge(clk);
+		wait until rising_edge(clk);
+		mmi.busy <= '0';
+		mmi.rddata <= x"33221100";
+		wait until rising_edge(clk);
+		wait until rising_edge(clk);
+
+		stop <= true;
 		wait;
 	end process;
 
