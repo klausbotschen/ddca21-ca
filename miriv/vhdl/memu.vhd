@@ -70,6 +70,7 @@ begin
 					M.wrdata(7 downto 0) <= W(7 downto 0);
 					R(7 downto 0) <= D.rddata(7 downto 0);
 					sign <= D.rddata(7);
+				when others => null;
 			end case;
 			if op.memtype = MEM_B then
 				R(31 downto 8) <= (others => sign);
@@ -91,6 +92,7 @@ begin
 					R(7 downto 0) <= D.rddata(15 downto 8);
 					R(15 downto 8) <= D.rddata(7 downto 0);
 					sign <= D.rddata(7);
+				when others => null;
 			end case;
 			if op.memtype = MEM_H then
 				R(31 downto 16) <= (others => sign);
