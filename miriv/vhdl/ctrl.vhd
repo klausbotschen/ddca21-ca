@@ -35,37 +35,37 @@ end entity;
 architecture rtl of ctrl is
 begin
 	
---	sync : process(all) is
---		-- Declaration(s)
---	begin
---		if res_n = '0' then
---			
---		elsif rising_edge(clk) then
---			state <= state_next;
---			state_next <= state;
---			
---			if
---			if
---		else;
---	end process;
---	
---	async : process(all) is
---		-- Declaration(s)
---	begin
---		case state is
---		when STATE_FLUSH_BRANCH_HI =>
---			flush_fetch <=  '1';
---			flush_dec <=  '1';
---			flush_exec <=  '1';
---		when STATE_FLUSH_BRANCH_LO =>
---			flush_fetch <=  '0';
---			flush_dec <=  '0';
---			flush_exec <=  '0';
---		when others =>
---			flush_fetch <=  '0';
---			flush_dec <=  '0';
---			flush_exec <=  '0';
---		end case;
---	end process;
+	flush_fetch <= '1' when pcsrc_in = '1' else '0';
+	flush_dec <= '1' when pcsrc_in = '1' else '0';
+	flush_exec <= '1' when pcsrc_in = '1' else '0';
+	flush_mem <= '0';
+	flush_wb <= '0';
+	pcsrc_out <= pcsrc_in;
+	
+	async : process(all) is
+		-- Declaration(s)
+	begin
+		if stall = '1' then
+			stall_fetch <= '1';
+			stall_dec <= '1';
+			stall_exec <= '1';
+			stall_mem <= '1';
+			stall_wb <= '1';
+		else
+			stall_fetch <= '0';
+			stall_dec <= '0';
+			stall_exec <= '0';
+			stall_mem <= '0';
+			stall_wb <= '0';
+		end if;
+		
+		if res_n = '0' then
+			stall_fetch <= '0';
+			stall_dec <= '0';
+			stall_exec <= '0';
+			stall_mem <= '0';
+			stall_wb <= '0';
+		end if;
+	end process;
 	
 end architecture;

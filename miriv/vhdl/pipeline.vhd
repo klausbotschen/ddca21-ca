@@ -60,7 +60,7 @@ architecture impl of pipeline is
 	signal mem_busy_from_mem : std_logic;
 	signal reg_write_from_mem : reg_write_type;
 	signal pc_new_from_mem : pc_type;
-	signal pcsrc : std_logic;
+	signal pcsrc_from_mem : std_logic;
 	signal wbop_from_mem : wb_op_type;
 	signal pc_old_from_mem : pc_type;
 	signal aluresult_from_mem : data_type;
@@ -75,20 +75,19 @@ architecture impl of pipeline is
 	signal reg_write_mem : reg_write_type;
 	signal reg_write_wr : reg_write_type;
 	
+	signal pcsrc_from_ctrl : std_logic;
 begin
 	
-	-- exercise III:
-	flush <= '0';
 	stall <= '1' when mem_busy_from_fetch = '1' or mem_busy_from_mem = '1' else '0';
 
 	fetch_inst : entity work.fetch
 	port map (
 		clk => clk,
 		res_n => res_n,
-		stall => stall,
-		flush => flush,
+		stall => stall_fetch,
+		flush => flush_fetch,
 		mem_busy => mem_busy_from_fetch,
-		pcsrc => pcsrc,
+		pcsrc => pcsrc_from_ctrl,
 		pc_in => pc_new_from_mem,
 		pc_out => pc_from_fetch,
 		instr => instr,
@@ -100,8 +99,8 @@ begin
 	port map (
 		clk => clk,
 		res_n => res_n,
-		stall => stall,
-		flush => flush,
+		stall => stall_dec,
+		flush => flush_dec,
 		pc_in => pc_from_fetch,
 		instr => instr,
 		reg_write => reg_write_from_wb,
@@ -116,8 +115,8 @@ begin
 	port map (
 		clk => clk,
 		res_n => res_n,
-		stall => stall,
-		flush => flush,
+		stall => stall_exec,
+		flush => flush_exec,
 		op => execop_from_decode,
 		pc_in => pc_from_decode,
 		pc_old_out => pc_old_from_exec,
@@ -138,8 +137,8 @@ begin
 	port map (
 		clk => clk,
 		res_n => res_n,
-		stall => stall,
-		flush => flush,
+		stall => stall_mem,
+		flush => flush_mem,
 		mem_busy => mem_busy_from_mem,
 		mem_op => memop_from_exec,
 		wbop_in => wbop_from_exec,
@@ -150,7 +149,7 @@ begin
 		zero => zero,
 		reg_write => reg_write_from_mem,
 		pc_new_out => pc_new_from_mem,
-		pcsrc => pcsrc,
+		pcsrc => pcsrc_from_mem,
 		wbop_out => wbop_from_mem,
 		pc_old_out => pc_old_from_mem,
 		aluresult_out => aluresult_from_mem,
@@ -165,8 +164,8 @@ begin
 	port map (
 		clk => clk,
 		res_n => res_n,
-		stall => stall,
-		flush => flush,
+		stall => stall_wb,
+		flush => flush_wb,
 		op => wbop_from_mem,
 		aluresult => aluresult_from_mem,
 		memresult => memresult,
@@ -174,45 +173,45 @@ begin
 		reg_write => reg_write_from_wb
 	);
 	
-	fwd_inst1 : entity work.fwd
-	port map (
-		reg_write_mem => reg_write_from_mem,
-		reg_write_wb => reg_write_from_wb,
-		reg => exec_op.rs1,
-		val => reg_write_mem.data,
-		do_fwd => reg_write_mem.write
-	);
-	reg_write_mem.reg <= exec_op.rs1;
-	
-	fwd_inst2 : entity work.fwd
-	port map (
-		reg_write_mem => reg_write_from_mem,
-		reg_write_wb => reg_write_from_wb,
-		reg => exec_op.rs2,
-		val => reg_write_wr.data,
-		do_fwd => reg_write_wr.write
-	);
-	reg_write_wr.reg <= exec_op.rs2;
-	
---	ctrl_inst : entity work.ctrl_inst
+--	fwd_inst1 : entity work.fwd
 --	port map (
---		clk => clk;
---		res_n => res_n;
---		stall => ;
---		stall_fetch => stall_fetch;
---		stall_dec => stall_dec;
---		stall_exec => stall_exec;
---		stall_mem => stall_mem;
---		stall_wb => stall_wb;
---		flush_fetch => flush_fetch;
---		flush_dec => flush_dec;
---		flush_exec => flush_exec;
---		flush_mem => flush_mem;
---		flush_wb => flush_wb;
---		wb_op_exec => ;
---		exec_op_dec => ;
---		pcsrc_in => ;
---		pcsrc_out => 
+--		reg_write_mem => reg_write_from_mem,
+--		reg_write_wb => reg_write_from_wb,
+--		reg => exec_op.rs1,
+--		val => reg_write_mem.data,
+--		do_fwd => reg_write_mem.write
 --	);
+--	reg_write_mem.reg <= exec_op.rs1;
+--	
+--	fwd_inst2 : entity work.fwd
+--	port map (
+--		reg_write_mem => reg_write_from_mem,
+--		reg_write_wb => reg_write_from_wb,
+--		reg => exec_op.rs2,
+--		val => reg_write_wr.data,
+--		do_fwd => reg_write_wr.write
+--	);
+--	reg_write_wr.reg <= exec_op.rs2;
+	
+	ctrl_inst : entity work.ctrl
+	port map (
+		clk => clk,
+		res_n => res_n,
+		stall => stall,
+		stall_fetch => stall_fetch,
+		stall_dec => stall_dec,
+		stall_exec => stall_exec,
+		stall_mem => stall_mem,
+		stall_wb => stall_wb,
+		flush_fetch => flush_fetch,
+		flush_dec => flush_dec,
+		flush_exec => flush_exec,
+		flush_mem => flush_mem,
+		flush_wb => flush_wb,
+		wb_op_exec => wbop_from_decode,
+		exec_op_dec => exec_op,
+		pcsrc_in => pcsrc_from_mem,
+		pcsrc_out => pcsrc_from_ctrl
+	);
 
 end architecture;
