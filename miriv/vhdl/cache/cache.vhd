@@ -147,7 +147,7 @@ begin
 							valid_in <= '1';
 							dirty_in <= '1';
 							wr <= '1';
-							data_in <= mem_in_mem.rddata;
+							data_in <= mem_out_cpu.wrdata;
 						end if;
 					end if;
 				end if;

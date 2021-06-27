@@ -79,6 +79,7 @@ begin
 		-- 3. write, cache miss
 		mco.address <= 14x"00F0";
 		mco.wr <= '1';
+		mco.wrdata <= x"44445555";
 		wait until rising_edge(clk);
 		mco.wr <= '0';
 		wait until rising_edge(clk);
@@ -86,11 +87,21 @@ begin
 		-- 4. write, cache hit
 		mco.address <= 14x"00E0";
 		mco.wr <= '1';
+		mco.byteena <= "0100";
+		mco.wrdata <= x"13571357";
 		wait until rising_edge(clk);
 		mco.wr <= '0';
 		wait until rising_edge(clk);
+		wait until rising_edge(clk);
+	
+		-- 5. read, cache hit
+		mco.rd <= '1';
+		wait until rising_edge(clk);
+		mco.rd <= '0';
+		wait until rising_edge(clk);
+		wait until rising_edge(clk);
 		
-		-- 5. read, cache miss + dirty = wb
+		-- 6. read, cache miss + dirty = wb
 		mco.address <= 14x"00F0";
 		mco.rd <= '1';
 		wait until rising_edge(clk);

@@ -14,7 +14,7 @@ add wave -noupdate -divider mem_out_cpu
 add wave -noupdate -radix hexadecimal /tb/uut/mem_out_cpu.address
 add wave -noupdate /tb/uut/mem_out_cpu.rd
 add wave -noupdate /tb/uut/mem_out_cpu.wr
-add wave -noupdate -radix hexadecimal /tb/uut/mem_out_cpu.byteena
+add wave -noupdate /tb/uut/mem_out_cpu.byteena
 add wave -noupdate -radix hexadecimal /tb/uut/mem_out_cpu.wrdata
 add wave -noupdate -divider mem_in_mem
 add wave -noupdate /tb/uut/mem_in_mem.busy
@@ -27,12 +27,13 @@ add wave -noupdate -divider mem_out_mem
 add wave -noupdate -radix hexadecimal /tb/uut/mem_out_mem.address
 add wave -noupdate /tb/uut/mem_out_mem.rd
 add wave -noupdate /tb/uut/mem_out_mem.wr
-add wave -noupdate -radix hexadecimal /tb/uut/mem_out_mem.byteena
+add wave -noupdate /tb/uut/mem_out_mem.byteena
 add wave -noupdate -radix hexadecimal /tb/uut/mem_out_mem.wrdata
 add wave -noupdate -divider Cache
 add wave -noupdate /tb/uut/cmgmnt/rd
 add wave -noupdate /tb/uut/cmgmnt/wr
 add wave -noupdate -radix hexadecimal /tb/uut/cmgmnt/index
+add wave -noupdate /tb/uut/byteena
 add wave -noupdate -radix hexadecimal /tb/uut/cdata/data_in
 add wave -noupdate -radix hexadecimal /tb/uut/cdata/data_out
 
