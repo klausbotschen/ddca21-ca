@@ -167,9 +167,10 @@ begin
 				mem_out_mem <= mem_out_cpu;
 				mem_out_mem.rd <= '1';
 				mem_in_cpu.busy <= '1';
-				csn.state <= C_RD_MEM_START;
+				csn.state <= C_RD_MEM_WAIT;
 			when C_RD_MEM_START =>  -- first read cycle to mem
 				mem_out_mem <= mem_out_cpu;
+				mem_out_mem.rd <= '1';
 				mem_in_cpu.busy <= '1';
 				csn.state <= C_RD_MEM_WAIT;
 			when C_RD_MEM_WAIT =>   -- wait mem completion

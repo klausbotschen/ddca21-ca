@@ -74,10 +74,32 @@ add wave -noupdate -group wb -radix hexadecimal /tb_cpu/dut/pipeline_inst/wb_ins
 add wave -noupdate -group wb -radix hexadecimal /tb_cpu/dut/pipeline_inst/wb_inst/memresult_next
 add wave -noupdate -group wb -radix hexadecimal /tb_cpu/dut/pipeline_inst/wb_inst/pc_old_in_next
 add wave -noupdate -group wb -childformat {{/tb_cpu/dut/pipeline_inst/wb_inst/reg_write.reg -radix unsigned} {/tb_cpu/dut/pipeline_inst/wb_inst/reg_write.data -radix hexadecimal}} -expand -subitemconfig {/tb_cpu/dut/pipeline_inst/wb_inst/reg_write.reg {-height 16 -radix unsigned} /tb_cpu/dut/pipeline_inst/wb_inst/reg_write.data {-height 16 -radix hexadecimal}} /tb_cpu/dut/pipeline_inst/wb_inst/reg_write
+add wave -noupdate -divider -height 40 Cache
+add wave -noupdate /tb_cpu/dut/cache_inst/cs.state
+add wave -noupdate /tb_cpu/dut/cache_inst/bypass_n
+add wave -noupdate /tb_cpu/dut/cache_inst/byteena
+add wave -noupdate -radix hexadecimal /tb_cpu/dut/cache_inst/index
+add wave -noupdate /tb_cpu/dut/cache_inst/rd
+add wave -noupdate /tb_cpu/dut/cache_inst/wr
+add wave -noupdate /tb_cpu/dut/cache_inst/hit
+add wave -noupdate /tb_cpu/dut/cache_inst/tag_out
+add wave -noupdate /tb_cpu/dut/cache_inst/dirty_out
+add wave -noupdate /tb_cpu/dut/cache_inst/valid_out
+add wave -noupdate -radix hexadecimal /tb_cpu/dut/cache_inst/data_in
+add wave -noupdate -radix hexadecimal /tb_cpu/dut/cache_inst/data_out
+add wave -noupdate -divider mem_out_mem
+add wave -noupdate -radix hexadecimal /tb_cpu/dut/cache_inst/mem_out_mem.address
+add wave -noupdate /tb_cpu/dut/cache_inst/mem_out_mem.rd
+add wave -noupdate /tb_cpu/dut/cache_inst/mem_out_mem.wr
+add wave -noupdate /tb_cpu/dut/cache_inst/mem_out_mem.byteena
+add wave -noupdate -radix hexadecimal /tb_cpu/dut/cache_inst/mem_out_mem.wrdata
+add wave -noupdate -divider mem_in_mem
+add wave -noupdate /tb_cpu/dut/cache_inst/mem_in_mem.busy
+add wave -noupdate -radix hexadecimal /tb_cpu/dut/cache_inst/mem_in_mem.rddata
 TreeUpdate [SetDefaultTree]
 quietly wave cursor active 1
-configure wave -namecolwidth 150
-configure wave -valuecolwidth 227
+configure wave -namecolwidth 200
+configure wave -valuecolwidth 150
 configure wave -justifyvalue left
 configure wave -signalnamewidth 1
 configure wave -snapdistance 10
@@ -90,5 +112,5 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits us
 update
-run 2us
+run 3us
 wave zoom full

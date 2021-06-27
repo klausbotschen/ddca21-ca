@@ -63,7 +63,7 @@ begin
 		IMEM_FILE => IMEM,
 		DMEM_FILE => DMEM,
 		IMEM_DELAY => 0,
-		DMEM_DELAY => 0
+		DMEM_DELAY => 7
 	)
 	port map (
 		clk => clk,

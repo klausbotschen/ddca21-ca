@@ -33,6 +33,9 @@ add wave -noupdate -divider Cache
 add wave -noupdate /tb/uut/cmgmnt/rd
 add wave -noupdate /tb/uut/cmgmnt/wr
 add wave -noupdate -radix hexadecimal /tb/uut/cmgmnt/index
+add wave -noupdate /tb/uut/tag_out
+add wave -noupdate /tb/uut/dirty_out
+add wave -noupdate /tb/uut/valid_out
 add wave -noupdate /tb/uut/byteena
 add wave -noupdate -radix hexadecimal /tb/uut/cdata/data_in
 add wave -noupdate -radix hexadecimal /tb/uut/cdata/data_out
