@@ -58,14 +58,6 @@ architecture rtl of mem is
 	signal pc_old_in_next : pc_type;
 begin
 	
-	-- fwd:
-	reg_write.write <= wb_next.write;
-	reg_write.reg <= wb_next.rd;
-	reg_write.data <= 
-	alu_next when wb_next.src = WBS_ALU else
-	memres when wb_next.src = WBS_MEM else
-	to_data_type(std_logic_vector(unsigned(pc_old_in_next) + 4));
-	
 	memresult <= memres;
 	pc_old_out <= pc_old_in_next;
 	
@@ -113,12 +105,25 @@ begin
 				pcsrc <= '0';
 		end case;
 		
-
 		if flush = '1' then
 			wbop_out <= WB_NOP;
 		else -- regular operation: tunnel through
 			wbop_out <= wb_next;
 		end if;
+
+		-- fwd:
+		reg_write.write <= '0';
+		reg_write.reg <= wb_next.rd;
+		reg_write.data <= (others => '0');
+
+		if wb_next.src = WBS_ALU then
+			reg_write.write <= wb_next.write;
+			reg_write.data <= alu_next;
+		elsif wb_next.src = WBS_OPC then
+			reg_write.write <= wb_next.write;
+			reg_write.data <= to_data_type(std_logic_vector(unsigned(pc_old_in_next) + 4));
+		end if;
+
 	end process;
 	
 	-- memory is clocked

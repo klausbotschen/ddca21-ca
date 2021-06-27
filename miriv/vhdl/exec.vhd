@@ -51,37 +51,48 @@ architecture rtl of exec is
 	signal pco_next, pc_adder_input1, pc_adder_out : pc_type;
 	
 	--fwd
-	signal readdata1 : data_type;
-	signal readdata2 : data_type;
+	signal readdata1, readdata2: data_type;
+	signal fwd1, fwd2 : std_logic;
 	
 	signal mop_next : mem_op_type;
 	signal wb_next : wb_op_type;
 begin
 	
+	fwd_inst1 : entity work.fwd
+	port map (
+		reg_write_mem => reg_write_mem,
+		reg_write_wb => reg_write_wr,
+		reg => op_next.rs1,
+		val => readdata1,
+		do_fwd => fwd1
+	);
+	
+	fwd_inst2 : entity work.fwd
+	port map (
+		reg_write_mem => reg_write_mem,
+		reg_write_wb => reg_write_wr,
+		reg => op_next.rs2,
+		val => readdata2,
+		do_fwd => fwd2
+	);
+
 	-- forwarding data and control purpose in exercise IV, not used in exercise III:
 	exec_op <= op_next;
 	
-	-- decide between forwarded data and current instruction for readdata1
-	readdata1 <= 
-	reg_write_mem.data when reg_write_mem.write = '1' else
-	op_next.readdata1;
+	-- MUX controlling input data for ALU input A
+	aluA <= to_data_type(pco_next) when op_next.alusrc2 = '1'
+				else readdata1 when fwd1 = '1'
+				else op_next.readdata1;
 	
-	-- decide between forwarded data and current instruction for readdata2
-	readdata2 <= 
-	reg_write_wr.data when reg_write_wr.write = '1' else
-	op_next.readdata2;
+	-- MUX controlling input data for ALU input B
+	aluB <= op_next.imm when op_next.alusrc1 = '1'
+				else readdata2 when fwd2 = '1'
+				else op_next.readdata2;
 	
-	-- 1-MUX controlling input data for ALU input A
-	aluA	<=	to_data_type(pco_next) when op_next.alusrc2 = '1' else
-				readdata1;
-	
-	-- 1-MUX controlling input data for ALU input B
-	aluB	<=	op_next.imm when op_next.alusrc1 = '1' else
-				readdata2;
-	
-	-- 1-MUX controlling input data for first input of PC-adder (second input is always connected to op_next.imm)
-	pc_adder_input1	<=	to_pc_type(readdata1) when op_next.alusrc3 = '1' else
-								pco_next;
+	-- MUX controlling input data for first input of PC-adder (second input is always connected to op_next.imm)
+	pc_adder_input1 <= pco_next when op_next.alusrc3 = '0'
+				else to_pc_type(readdata1) when fwd1 = '1'
+				else to_pc_type(op_next.readdata1);
 	
 	-- PC-adder
 	pc_adder_out <= std_logic_vector(unsigned(pc_adder_input1) + unsigned(to_pc_type(op_next.imm)));

@@ -23,25 +23,21 @@ begin
 	begin
 		Z <= '-';
 		R <= (others => '0');
+		shiftby := to_integer(unsigned(B(4 downto 0)));
 		case op is
 			when ALU_NOP =>
 				R <= B;
 			when ALU_SLT =>
-				R(R'high-1 downto 1) <= (others => '0');
 				if signed(A) < signed(B) then R(0) <= '1'; else R(0) <= '0'; end if;
 				Z <= not R(0);
 			when ALU_SLTU =>
-				R(R'high-1 downto 1) <= (others => '0');
 				if unsigned(A) < unsigned(B) then R(0) <= '1'; else R(0) <= '0'; end if;
 				Z <= not R(0);
 			when ALU_SLL => -- A sll B(4 downto 0)
-				shiftby := to_integer(unsigned(B(4 downto 0)));
 				R <= std_logic_vector(shift_left(unsigned(A), shiftby));
 			when ALU_SRL => -- A srl B(4 downto 0)
-				shiftby := to_integer(unsigned(B(4 downto 0)));
 				R <= std_logic_vector(shift_right(unsigned(A), shiftby));
 			when ALU_SRA => -- A sra B(4 downto 0)
-				shiftby := to_integer(unsigned(B(4 downto 0)));
 				R <= std_logic_vector(shift_right(signed(A), shiftby));
 			when ALU_ADD =>
 				R <= std_logic_vector(signed(A) + signed(B));

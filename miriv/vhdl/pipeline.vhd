@@ -72,9 +72,6 @@ architecture impl of pipeline is
 	signal flush_wb : std_logic;
 	signal reg_write_from_wb : reg_write_type;
 	
-	signal reg_write_mem : reg_write_type;
-	signal reg_write_wr : reg_write_type;
-	
 	signal pcsrc_from_ctrl : std_logic;
 begin
 	
@@ -129,8 +126,8 @@ begin
 		wbop_in => wbop_from_decode,
 		wbop_out => wbop_from_exec,
 		exec_op => exec_op,
-		reg_write_mem => reg_write_mem,
-		reg_write_wr => reg_write_wr
+		reg_write_mem => reg_write_from_mem,
+		reg_write_wr => reg_write_from_wb
 	);
 	
 	mem_inst : entity work.mem
@@ -173,26 +170,7 @@ begin
 		reg_write => reg_write_from_wb
 	);
 	
---	fwd_inst1 : entity work.fwd
---	port map (
---		reg_write_mem => reg_write_from_mem,
---		reg_write_wb => reg_write_from_wb,
---		reg => exec_op.rs1,
---		val => reg_write_mem.data,
---		do_fwd => reg_write_mem.write
---	);
---	reg_write_mem.reg <= exec_op.rs1;
---	
---	fwd_inst2 : entity work.fwd
---	port map (
---		reg_write_mem => reg_write_from_mem,
---		reg_write_wb => reg_write_from_wb,
---		reg => exec_op.rs2,
---		val => reg_write_wr.data,
---		do_fwd => reg_write_wr.write
---	);
---	reg_write_wr.reg <= exec_op.rs2;
-	
+
 	ctrl_inst : entity work.ctrl
 	port map (
 		clk => clk,
