@@ -5,26 +5,29 @@
 	\toprule
 	                     & LC Combinationals & LC Registers & Memory Bits \\
 	\midrule
-	Fetch Stage          &                   &              &             \\
-	Decode Stage         &                   &              &             \\
-	-- Register File     &                   &              &             \\
-	Execute Stage        &                   &              &             \\
-	-- ALU               &                   &              &             \\
-	Memory Stage         &                   &              &             \\
-	-- Memory Unit       &                   &              &             \\
-	Write-Back Stage     &                   &              &             \\
-	Forwarding Unit      &                   &              &             \\
-	Control Unit         &                   &              &             \\
+	Fetch Stage          &  82          & 16     &  0        \\
+	Decode Stage         &  165         & 47     &  0        \\
+	-- Register File     &  149         & 162    &  2048      \\
+	Execute Stage        &  336         & 152    &  0          \\
+	-- ALU               &  696         & 0      &  0         \\
+	Memory Stage         &  88          & 113    &  0          \\
+	-- Memory Unit       &  85          & 0      &  0          \\
+	Write-Back Stage     &  87          & 88     &  0          \\
+	Forwarding Unit      &  15          & 0      &  0           \\
+	Control Unit         &              &        &             \\
 	\cmidrule{1-4}
-	Sum                  &                   &              &             \\
+	Sum                  &              &        &             \\
 \bottomrule
 \end{tabular}
 \end{table}
 
 \begin{qa}
 	\question{What is the maximum frequency of your design?}
-	\answer{}
+	\answer{92MHz with aggressive optimization at 85°C; with balanced mode $f_{max}=84.36MHz$.}
 	\question{Where is the critical path of your design?}
-	\answer{}
+	\answer{The critical path is mostly due to the forwarding, e.g.
+	from WB wb\_next register via the EXEC forwarding mux through the
+	ALU bit shift combinatorial logic finally to the alu\_next register
+	in the MEM stage.}
 \end{qa}
 
