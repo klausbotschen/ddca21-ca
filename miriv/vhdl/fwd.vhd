@@ -36,6 +36,7 @@ begin
 			val <= reg_write_wb.data;
 			do_fwd <= '1';
 		end if;
+		if reg = ZERO_REG then do_fwd <= '0'; end if;
 	end process;
 	
 end architecture;
