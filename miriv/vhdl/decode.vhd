@@ -105,7 +105,7 @@ begin
 	port map (
 		clk        => clk,
 		res_n      => res_n,
-		stall      => stall,
+		stall      => stall and not reg_write.write,
 		rdaddr1    => instr(19 downto 15),
 		rdaddr2    => instr(24 downto 20),
 		rddata1    => rd1,
@@ -116,9 +116,9 @@ begin
 	);
 	-- --------------------------------------------
 
-sync: process(clk, res_n) is
+sync: process(clk, res_n, flush) is
 	begin
-		if res_n = '0' then
+		if res_n = '0' or flush = '1' then
 			inst <= NOP_INST;
 			pc_out <= (others => '0');
 		elsif rising_edge(clk) then

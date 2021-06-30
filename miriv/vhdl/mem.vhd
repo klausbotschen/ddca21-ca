@@ -112,16 +112,16 @@ begin
 		end if;
 
 		-- fwd:
-		reg_write.write <= '0';
+		reg_write.write <= wb_next.write;
 		reg_write.reg <= wb_next.rd;
 		reg_write.data <= (others => '0');
 
 		if wb_next.src = WBS_ALU then
-			reg_write.write <= wb_next.write;
 			reg_write.data <= alu_next;
 		elsif wb_next.src = WBS_OPC then
-			reg_write.write <= wb_next.write;
 			reg_write.data <= to_data_type(std_logic_vector(unsigned(pc_old_in_next) + 4));
+		else
+			reg_write.data <= memres;
 		end if;
 
 	end process;

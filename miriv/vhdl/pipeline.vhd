@@ -186,8 +186,8 @@ begin
 		flush_exec => flush_exec,
 		flush_mem => flush_mem,
 		flush_wb => flush_wb,
-		wb_op_exec => wbop_from_decode,
-		exec_op_dec => exec_op,
+		wb_op_exec => wbop_from_exec,
+		exec_op_dec => execop_from_decode,
 		pcsrc_in => pcsrc_from_mem,
 		pcsrc_out => pcsrc_from_ctrl
 	);
