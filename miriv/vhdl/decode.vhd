@@ -94,11 +94,14 @@ architecture rtl of decode is
 	end function;
 	----------------------------------------------
 
-	signal rd : reg_adr_type;
-	signal inst : instr_type := NOP_INST;
+	signal rd, rs1, rs2 : reg_adr_type;
+	signal regi, inst : instr_type := NOP_INST;
 	signal imm, rd1, rd2 : data_type;
 
 begin
+
+	-- register look ahead
+	regi <= instr when stall = '0' else inst;
 
 	-- --------------------------------------------
 	regfile_inst : entity work.regfile
@@ -106,8 +109,8 @@ begin
 		clk        => clk,
 		res_n      => res_n,
 		stall      => stall and not reg_write.write,
-		rdaddr1    => instr(19 downto 15),
-		rdaddr2    => instr(24 downto 20),
+		rdaddr1    => regi(19 downto 15),
+		rdaddr2    => regi(24 downto 20),
 		rddata1    => rd1,
 		rddata2    => rd2,
 		wraddr     => reg_write.reg,
