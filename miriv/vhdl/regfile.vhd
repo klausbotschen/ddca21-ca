@@ -34,9 +34,9 @@ begin
 		if stall = '0' then
 			rda1nx <= to_integer(unsigned(rdaddr1));
 			rda2nx <= to_integer(unsigned(rdaddr2));
-			if regwrite = '1' and unsigned(wraddr) > 0 then
-				ram(to_integer(unsigned(wraddr))) <= wrdata;
-			end if;
+		end if;
+		if regwrite = '1' and unsigned(wraddr) > 0 then
+			ram(to_integer(unsigned(wraddr))) <= wrdata;
 		end if;
 	end if;
 	end process;
