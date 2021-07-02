@@ -14,8 +14,8 @@ entity mgmt_st_1w is
 		res_n   : in std_logic;
 
 		index   : in c_index_type;
-		we      : in std_logic;
-		wrd   	: in std_logic;
+		we      : in std_logic; -- write dirty+data
+		wrv     : in std_logic; -- write valid bit
 
 		mgmt_info_in  : in c_mgmt_info;
 		mgmt_info_out : out c_mgmt_info
@@ -48,11 +48,10 @@ begin
 		  dirtreg <= (others => '0');
 		elsif rising_edge(clk) then
 			if we = '1' then
-				valreg(to_integer(unsigned(index))) <= mgmt_info_in.valid;
 				dirtreg(to_integer(unsigned(index))) <= mgmt_info_in.dirty;
 			end if;
-			if wrd = '1' then
-				dirtreg(to_integer(unsigned(index))) <= mgmt_info_in.dirty;
+			if wrv = '1' then
+				valreg(to_integer(unsigned(index))) <= mgmt_info_in.valid;
 			end if;
 		end if;
 	end process;

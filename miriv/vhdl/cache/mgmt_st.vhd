@@ -16,8 +16,8 @@ entity mgmt_st is
 		res_n : in std_logic;
 
 		index : in c_index_type;
-		wr    : in std_logic;
-		wrd   : in std_logic; -- update only dirty bit
+		wrv   : in std_logic; -- write valid bit
+		wr    : in std_logic; -- write dirty+data
 		rd    : in std_logic;
 
 		valid_in    : in std_logic;
@@ -42,8 +42,8 @@ begin
 			clk     => clk,
 			res_n   => res_n,
 			index   => index,
-			we      => wr,
-			wrd   	=> wrd, -- update only dirty bit
+			wrv     => wrv, -- write valid bit
+			we      => wr, -- write dirty+data
 			mgmt_info_in  => entry_w,
 			mgmt_info_out => entry_r
 		);

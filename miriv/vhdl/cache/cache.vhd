@@ -42,7 +42,7 @@ architecture impl of cache is
 		C_WB             -- finish write
 	);
 	signal index : c_index_type;
-	signal rd, wr, wrd, valid_in, valid_out : std_logic := '0';
+	signal rd, wr, wrv, valid_in, valid_out : std_logic := '0';
 	signal dirty_in, dirty_out, hit: std_logic := '0';
 	signal bypass_n : std_logic;
 	signal way_out : c_way_type;
@@ -50,13 +50,8 @@ architecture impl of cache is
 	signal data_in, data_out : mem_data_type;
 	signal byteena : mem_byteena_type;
 	
-	type statevar_t is record
-		state : CACHE_STATE;
-	end record;
-	constant STATEVAR_NUL : statevar_t := (
-		state   => C_IDLE
-	);
-	signal cs, csn: statevar_t;
+	-- registers
+	signal state, state_next : CACHE_STATE;
 begin
 
 	cmgmnt : entity work.mgmt_st(impl)
@@ -68,8 +63,8 @@ begin
 			clk     => clk,
 			res_n   => res_n,
 			index   => index,
-			wr      => wr,
-			wrd     => wrd,
+			wr      => wr, -- write dirty+data
+			wrv     => wrv, -- write valid bit
 			rd	    => rd,
 			valid_in     => valid_in,
 			dirty_in     => dirty_in,
@@ -105,57 +100,57 @@ begin
 	sync : process(clk, res_n)
 	begin
 		if res_n = '0' then
-			cs <= STATEVAR_NUL;
+			state <= C_IDLE;
 		elsif rising_edge(clk) then
-			cs <= csn;
+			state <= state_next;
 		end if;
 	end process;
 
 	fsm : process(all)
 	begin
-		csn <= cs;
+		state_next <= state;
 		mem_out_mem <= MEM_OUT_NOP;
 		mem_in_cpu <= MEM_IN_NOP;
 		byteena <= (others => '0');
 		rd <= '0';
 		wr <= '0';
-		wrd <= '0';
+		wrv <= '0';
 		valid_in <= '0';
 		dirty_in <= '0';
 		data_in <= (others => '0');
-		case cs.state is
+		case state is
 			when C_IDLE =>
 				if bypass_n = '0' then       -- bypass
 					mem_out_mem <= mem_out_cpu; 
 					mem_in_cpu <= mem_in_mem; 
 				else
-					byteena <= mem_out_cpu.byteena;
 					rd <= mem_out_cpu.rd or mem_out_cpu.wr; -- check cache
 					if hit = '0' then          -- cache miss
 						if mem_out_cpu.rd = '1' then
 							if valid_out = '1' and dirty_out = '1' then
 								-- prepare write back, wait for data from cache
-								csn.state <= C_WB_START;
+								state_next <= C_WB_START;
 							else
-								csn.state <= C_RD_MEM_START;
+								state_next <= C_RD_MEM_START;
 							end if;
 						elsif mem_out_cpu.wr = '1' then -- direct write
 							mem_out_mem <= mem_out_cpu;
 						end if;
 					else                       -- cache hit
 						if mem_out_cpu.rd = '1' then
-							csn.state <= C_RD_CACHE;
+							state_next <= C_RD_CACHE;
 						elsif mem_out_cpu.wr = '1' then -- instant store in cache
 							dirty_in <= '1';
-							wrd <= '1';
+							byteena <= mem_out_cpu.byteena;
 							data_in <= mem_out_cpu.wrdata;
+							wr <= '1';
 						end if;
 					end if;
 				end if;
 			when C_RD_CACHE =>      -- get cache entry
 				mem_in_cpu.rddata <= data_out;
-				csn.state <= C_IDLE;
-			when C_WB_START =>      -- write back, write cycle
+				state_next <= C_IDLE;
+			when C_WB_START =>      -- write back, single clock write cycle
 				mem_out_mem.address(ADDR_WIDTH-1 downto SETS_LD) <= tag_out;
 				mem_out_mem.address(SETS_LD-1 downto 0) <= index;
 				mem_out_mem.rd <= '0';
@@ -163,31 +158,32 @@ begin
 				mem_out_mem.byteena <= (others => '1');
 				mem_out_mem.wrdata <= data_out;
 				mem_in_cpu.busy <= '1';
-				csn.state <= C_WB;
+				state_next <= C_WB;
 			when C_WB =>            -- write back done, start read cycle
 				mem_out_mem <= mem_out_cpu;
 				mem_out_mem.rd <= '1';
 				mem_in_cpu.busy <= '1';
-				csn.state <= C_RD_MEM_WAIT;
+				state_next <= C_RD_MEM_WAIT;
 			when C_RD_MEM_START =>  -- first read cycle to mem
 				mem_out_mem <= mem_out_cpu;
 				mem_out_mem.rd <= '1';
 				mem_in_cpu.busy <= '1';
-				csn.state <= C_RD_MEM_WAIT;
+				state_next <= C_RD_MEM_WAIT;
 			when C_RD_MEM_WAIT =>   -- wait mem completion
 				mem_out_mem <= mem_out_cpu;
 				mem_in_cpu.busy <= '1';
 				mem_in_cpu.rddata <= mem_in_mem.rddata;
 				if mem_in_mem.busy = '0' then
-					csn.state <= C_IDLE;
+					state_next <= C_IDLE;
 					-- forward to CPU
 					mem_in_cpu.busy <= '0';
 					-- write to cache
 					valid_in <= '1';
 					dirty_in <= '0';
 					byteena <= (others => '1');
-					wr <= '1';
 					data_in <= mem_in_mem.rddata;
+					wr <= '1';
+					wrv <= '1';
 				end if;
 		end case;
 	end process;
