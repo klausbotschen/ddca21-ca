@@ -42,7 +42,7 @@ architecture impl of cache is
 		C_WB             -- finish write
 	);
 	signal index : c_index_type;
-	signal rd, wr, valid_in, valid_out : std_logic := '0';
+	signal rd, wr, wrd, valid_in, valid_out : std_logic := '0';
 	signal dirty_in, dirty_out, hit: std_logic := '0';
 	signal bypass_n : std_logic;
 	signal way_out : c_way_type;
@@ -69,6 +69,7 @@ begin
 			res_n   => res_n,
 			index   => index,
 			wr      => wr,
+			wrd     => wrd,
 			rd	    => rd,
 			valid_in     => valid_in,
 			dirty_in     => dirty_in,
@@ -118,6 +119,7 @@ begin
 		byteena <= (others => '0');
 		rd <= '0';
 		wr <= '0';
+		wrd <= '0';
 		valid_in <= '0';
 		dirty_in <= '0';
 		data_in <= (others => '0');
@@ -144,9 +146,8 @@ begin
 						if mem_out_cpu.rd = '1' then
 							csn.state <= C_RD_CACHE;
 						elsif mem_out_cpu.wr = '1' then -- instant store in cache
-							valid_in <= '1';
 							dirty_in <= '1';
-							wr <= '1';
+							wrd <= '1';
 							data_in <= mem_out_cpu.wrdata;
 						end if;
 					end if;

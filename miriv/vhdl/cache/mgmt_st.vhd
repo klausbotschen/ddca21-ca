@@ -17,6 +17,7 @@ entity mgmt_st is
 
 		index : in c_index_type;
 		wr    : in std_logic;
+		wrd   : in std_logic; -- update only dirty bit
 		rd    : in std_logic;
 
 		valid_in    : in std_logic;
@@ -42,7 +43,7 @@ begin
 			res_n   => res_n,
 			index   => index,
 			we      => wr,
-			we_repl	=> wr,
+			wrd   	=> wrd, -- update only dirty bit
 			mgmt_info_in  => entry_w,
 			mgmt_info_out => entry_r
 		);
@@ -56,6 +57,6 @@ begin
 	tag_out <= entry_r.tag;
 	hit_out <= '1' when (rd = '1' or wr = '1')
 				and entry_r.valid = '1'
-				and tag_in = tag_out
+				and entry_r.tag = tag_in
 				else '0';
 end architecture;
