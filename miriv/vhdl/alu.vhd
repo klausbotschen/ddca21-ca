@@ -19,7 +19,7 @@ end alu;
 architecture rtl of alu is
 begin
 	alu_p: process(all)
-		variable shiftby : natural;
+		variable shiftby : natural := 0;
 	begin
 		Z <= '-';
 		R <= (others => '0');
