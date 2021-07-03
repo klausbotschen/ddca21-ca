@@ -47,16 +47,20 @@ begin
 			mgmt_info_in  => entry_w,
 			mgmt_info_out => entry_r
 		);
-	way_out <= (others => '0');
+
 	entry_w.valid <= valid_in;
 	entry_w.dirty <= dirty_in;
 	entry_w.replace <= '0';
 	entry_w.tag <= tag_in;
+
+	way_out <= (others => '0');
 	valid_out <= entry_r.valid;
 	dirty_out <= entry_r.dirty;
 	tag_out <= entry_r.tag;
-	hit_out <= '1' when (rd = '1' or wr = '1')
-				and entry_r.valid = '1'
-				and entry_r.tag = tag_in
+
+	hit_out <= '1' when rd = '1'
+				and valid_out = '1'
+				and tag_out = tag_in
 				else '0';
+
 end architecture;

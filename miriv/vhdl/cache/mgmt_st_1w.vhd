@@ -30,17 +30,15 @@ architecture impl of mgmt_st_1w is
 	type VREG is array(0 TO (2**SETS_LD)-1) of std_logic;
 	signal valreg : CREG := (others => '0');
 	signal dirtreg : CREG := (others => '0');
-	signal valr, valw, dirtr, dirtw : std_logic;
 begin
 
-	-- read
+	-- asynchronous read
 	mgmt_info_out.valid <= valreg(to_integer(unsigned(index)));
 	mgmt_info_out.dirty <= dirtreg(to_integer(unsigned(index)));
 	mgmt_info_out.replace <= '0';
 	mgmt_info_out.tag <= tmem(to_integer(unsigned(index)));
-	-- write
 
-	-- use registers for valid an dirty bit
+	-- use registers, the FPGA only has synchronous RAM nodes
 	vbit_p: process(clk, res_n)
 	begin
 		if res_n = '0' then
@@ -49,19 +47,10 @@ begin
 		elsif rising_edge(clk) then
 			if we = '1' then
 				dirtreg(to_integer(unsigned(index))) <= mgmt_info_in.dirty;
+				tmem(to_integer(unsigned(index))) <= mgmt_info_in.tag;
 			end if;
 			if wrv = '1' then
 				valreg(to_integer(unsigned(index))) <= mgmt_info_in.valid;
-			end if;
-		end if;
-	end process;
-
-	-- use sram for tag info
-	rmem_p: process(clk)
-	begin
-		if rising_edge(clk) then
-			if we = '1' then
-				tmem(to_integer(unsigned(index))) <= mgmt_info_in.tag;
 			end if;
 		end if;
 	end process;

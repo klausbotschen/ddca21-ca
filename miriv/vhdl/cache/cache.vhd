@@ -46,7 +46,7 @@ architecture impl of cache is
 	signal dirty_in, dirty_out, hit: std_logic := '0';
 	signal bypass_n : std_logic;
 	signal way_out : c_way_type;
-	signal tag_in, tag_out : c_tag_type;
+	signal tag_in, tag_out, tao_next : c_tag_type;
 	signal data_in, data_out : mem_data_type;
 	signal byteena : mem_byteena_type;
 	
@@ -72,7 +72,7 @@ begin
 			way_out      => open,
 			valid_out    => valid_out,
 			dirty_out    => dirty_out,
-			tag_out      => tag_out,
+			tag_out      => tao_next,
 			hit_out      => hit
 	);
 	
@@ -101,8 +101,12 @@ begin
 	begin
 		if res_n = '0' then
 			state <= C_IDLE;
+			tag_out <= (others => '0');
 		elsif rising_edge(clk) then
 			state <= state_next;
+			if state = C_IDLE then
+				tag_out <= tao_next;
+			end if;
 		end if;
 	end process;
 
