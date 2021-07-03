@@ -39,22 +39,19 @@ architecture rtl of ctrl is
 	signal wb_op_exec_next : wb_op_type;
 	signal exec_op_dec_next : exec_op_type;
 	signal pcsrc_in_next : std_logic;
-	signal read_stall_fetch : std_logic;
-	signal read_stall_dec : std_logic;
-	signal read_stall_exec : std_logic;
-	signal flush_exec_read_stall : std_logic;
+	signal read_stall_fde : std_logic;
 	signal flush_mem_read_stall : std_logic;
 begin
 	
 	flush_fetch <= '1' when pcsrc_in = '1' else '0';
 	flush_dec <= '1' when pcsrc_in = '1' else '0';
-	flush_exec <= '1' when pcsrc_in = '1' or flush_exec_read_stall = '1' else '0';
+	flush_exec <= '1' when pcsrc_in = '1' else '0';
 	flush_mem <= '1' when flush_mem_read_stall = '1' else '0';
 	flush_wb <= '0';
 	
-	stall_fetch <= '1' when stall = '1' or read_stall_fetch = '1' else '0';
-	stall_dec <= '1' when stall = '1' or read_stall_dec = '1' else '0';
-	stall_exec <= '1' when stall = '1' or read_stall_exec = '1' else '0';
+	stall_fetch <= '1' when stall = '1' or read_stall_fde = '1' else '0';
+	stall_dec <= '1' when stall = '1' or read_stall_fde = '1' else '0';
+	stall_exec <= '1' when stall = '1' or read_stall_fde = '1' else '0';
 	stall_mem <= stall;
 	stall_wb <= stall;
 	
@@ -85,11 +82,8 @@ begin
 	async : process(all) is
 		-- Declaration(s)
 	begin
-		read_stall_fetch <= '0';
-		read_stall_dec <= '0';
-		read_stall_exec <= '0';
+		read_stall_fde <= '0';
 		flush_mem_read_stall <= '0';
-		flush_exec_read_stall <= '0';
 		state_next <= state;
 		
 		case state is
@@ -98,9 +92,7 @@ begin
 					state_next <= s1;
 				end if;
 			when s1 =>
-				read_stall_fetch <= '1';
-				read_stall_dec <= '1';
-				read_stall_exec <= '1';
+				read_stall_fde <= '1';
 				if stall = '0' then
 					state_next <= s2;
 				end if;
