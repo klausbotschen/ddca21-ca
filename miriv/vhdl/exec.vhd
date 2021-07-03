@@ -42,13 +42,13 @@ architecture rtl of exec is
 												others => '1');
 	
 	-- next ALU operation data from previous stage
-	signal op_next : exec_op_type;
+	signal op_next : exec_op_type := EXEC_NOP;
 	
 	-- ALU
-	signal aluA, aluB : data_type;
+	signal aluA, aluB : data_type := (others => '0');
 	
 	-- pc-adder
-	signal pco_next, pc_adder_input1, pc_adder_out : pc_type;
+	signal pco_next, pc_adder_input1, pc_adder_out : pc_type := (others => '0');
 	
 	--fwd
 	signal readdata1, readdata2: data_type;

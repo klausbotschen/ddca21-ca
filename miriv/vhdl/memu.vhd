@@ -12,15 +12,15 @@ entity memu is
 		op   : in  memu_op_type; -- rd, wr, type(bhw)
 		A    : in  data_type; -- address
 		W    : in  data_type; -- write data
-		R    : out data_type := (others => '0'); -- result of memory load
+		R    : out data_type; -- result of memory load
 
-		B    : out std_logic := '0';  -- busy
-		XL   : out std_logic := '0';  -- exception load
-		XS   : out std_logic := '0';  -- exception store
+		B    : out std_logic;  -- busy
+		XL   : out std_logic;  -- exception load
+		XS   : out std_logic;  -- exception store
 
 		-- to memory controller
 		D    : in  mem_in_type; -- busy, rddata
-		M    : out mem_out_type := MEM_OUT_NOP -- adr, rd, wr, bena, wrdata
+		M    : out mem_out_type -- adr, rd, wr, bena, wrdata
 	);
 end entity;
 
