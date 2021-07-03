@@ -41,7 +41,7 @@ architecture impl of cache is
 		C_WB_START,      -- dirty, first write cycle
 		C_WB             -- finish write
 	);
-	signal index : c_index_type;
+	signal index : c_index_type := (others => '0');
 	signal rd, wr, wrv, valid_in, valid_out : std_logic := '0';
 	signal dirty_in, dirty_out, hit: std_logic := '0';
 	signal bypass_n : std_logic;
@@ -92,7 +92,7 @@ begin
 			data_out => data_out
 	);
 	
-	bypass_n <= '1' when unsigned(mem_out_cpu.address and not ADDR_MASK) = 0 else '0';
+	bypass_n <= '1' when (mem_out_cpu.address and not ADDR_MASK) = MEM_OUT_NOP.address else '0';
 	-- address is in words
 	tag_in <= mem_out_cpu.address(ADDR_WIDTH-1 downto SETS_LD);
 	index <= mem_out_cpu.address(SETS_LD-1 downto 0);
