@@ -72,42 +72,50 @@ do_test(void)
 	"abc", "900150983cd24fb0d6963f7d28e17f72",
 	"message digest", "f96b697d7cb7938d525a2f31aaf161d0",
 	"abcdefghijklmnopqrstuvwxyz", "c3fcd3d76192e4007dfb496cca67e13b",
-	"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789",
-				"d174ab98d277d9f5a5611c2c9f419d9f",
+	"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789",	"d174ab98d277d9f5a5611c2c9f419d9f",
 	"12345678901234567890123456789012345678901234567890123456789012345678901234567890", "57edf4a22be3c955ac49da2e2107b67a"
     };
     int i;
     int status = 0;
 
-    for (i = 0; i < 7*2; i += 2) {
-	md5_state_t state;
-	md5_byte_t digest[16];
-	char hex_output[16*2 + 1];
-	int di;
-
-	md5_init(&state);
-	md5_append(&state, (const md5_byte_t *)test[i], strlen(test[i]));
-	md5_finish(&state, digest);
-	for (di = 0; di < 16; ++di) {
-	    /* sprintf(hex_output + di * 2, "%02x", digest[di]); */
-		const char *hex_digits = "0123456789abcdef";
-		hex_output[2*di+0] = hex_digits[digest[di] >> 4];
-		hex_output[2*di+1] = hex_digits[digest[di] & 0xf];
-		hex_output[2*di+2] = '\0';
-	}
-	if (strcmp(hex_output, test[i + 1])) {
-	    /* printf("MD5 (\"%s\") = ", test[i]); */
-		puts(test[i]);
-	    puts(hex_output);
-	    /* printf("**** ERROR, should be: %s\n", test[i + 1]); */
-		puts("**** ERROR, should be: ");
-		puts(test[i+1]);
-	    status = 1;
-	}
+		puts("\rmd5 test run start:\r");
+		for (i = 0; i < 7*2; i += 2)
+		{
+			md5_state_t state;
+			md5_byte_t digest[16];
+			char hex_output[16*2 + 1];
+			int di;
+			puts(test[i]);
+			putchar('\r');
+			
+			md5_init(&state);
+			md5_append(&state, (const md5_byte_t *)test[i], strlen(test[i]));
+			md5_finish(&state, digest);
+			for (di = 0; di < 16; ++di)
+			{
+					/* sprintf(hex_output + di * 2, "%02x", digest[di]); */
+				const char *hex_digits = "0123456789abcdef";
+				hex_output[2*di+0] = hex_digits[digest[di] >> 4];
+				hex_output[2*di+1] = hex_digits[digest[di] & 0xf];
+				hex_output[2*di+2] = '\0';
+			}
+			if (strcmp(hex_output, test[i + 1]))
+			{
+				/* printf("MD5 (\"%s\") = ", test[i]); */
+				puts(hex_output);
+				putchar('\r');
+				/* printf("**** ERROR, should be: %s\n", test[i + 1]); */
+				puts("**** ERROR, should be: ");
+				puts(test[i+1]);
+					status = 1;
+				putchar('\r');
+			}
     }
     if (status == 0)
-	puts("md5 self-test completed successfully.");
-    return status;
+			puts("md5 self-test completed successfully.\r");
+		else
+			puts("\rmd5 test run failed.\r");
+		return status;
 }
 
 /* /\* Print the T values. *\/ */
