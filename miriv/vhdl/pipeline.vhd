@@ -42,7 +42,6 @@ architecture impl of pipeline is
 	signal execop_from_decode : exec_op_type;
 	signal memop_from_decode : mem_op_type;
 	signal wbop_from_decode : wb_op_type;
-	signal exc_dec : std_logic;
 	
 	signal stall_exec : std_logic;
 	signal flush_exec : std_logic;
@@ -65,8 +64,6 @@ architecture impl of pipeline is
 	signal pc_old_from_mem : pc_type;
 	signal aluresult_from_mem : data_type;
 	signal memresult : data_type;
-	signal exc_load : std_logic;
-	signal exc_store : std_logic;
 	
 	signal stall_wb : std_logic;
 	signal flush_wb : std_logic;
@@ -105,7 +102,7 @@ begin
 		exec_op => execop_from_decode,
 		mem_op => memop_from_decode,
 		wb_op => wbop_from_decode,
-		exc_dec => exc_dec
+		exc_dec => open
 	);
 	
 	exec_inst : entity work.exec
@@ -125,7 +122,7 @@ begin
 		memop_out => memop_from_exec,
 		wbop_in => wbop_from_decode,
 		wbop_out => wbop_from_exec,
-		exec_op => exec_op,
+		exec_op => open,
 		reg_write_mem => reg_write_from_mem,
 		reg_write_wr => reg_write_from_wb
 	);
@@ -153,8 +150,8 @@ begin
 		memresult => memresult,
 		mem_out => mem_d_out,
 		mem_in => mem_d_in,
-		exc_load => exc_load,
-		exc_store => exc_store
+		exc_load => open,
+		exc_store => open
 	);
 	
 	wb_inst : entity work.wb
