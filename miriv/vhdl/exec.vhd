@@ -117,9 +117,10 @@ begin
 		end if;
 	end process;
 	
+	wrdata <= op_next.readdata2 when fwd2 = '0' else readdata2;
+	
 	async : process(all) is
 	begin
-		wrdata <= op_next.readdata2;
 		pc_old_out <= pco_next;
 		
 		if flush = '1' then -- flush: write NOPs to subsequent stage
