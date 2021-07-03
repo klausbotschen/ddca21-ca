@@ -21,7 +21,7 @@ architecture bench of tb is
 	signal res_n : std_logic := '0';
 	signal stop : boolean := false;
 	
-	signal mco, mmo: mem_out_type;
+	signal mco, mmo: mem_out_type := MEM_OUT_NOP;
 	signal mci, mmi: mem_in_type;
 
 begin
@@ -52,6 +52,7 @@ begin
 		res_n <= '1';
 
 		-- 1. read, cache miss
+		report "read, cache miss ";
 		mco.address <= 14x"00E0";
 		mco.rd <= '1';
 		mco.wr <= '0';
@@ -60,6 +61,9 @@ begin
 
 		wait until rising_edge(clk);
 		mco.rd <= '0';
+		wait until falling_edge(clk);
+		assert mmo.rd = '1';
+
 		wait until rising_edge(clk);
 		mmi.busy <= '1';
 		wait until rising_edge(clk);
@@ -70,6 +74,7 @@ begin
 		wait until rising_edge(clk);
 		
 		-- 2. read, cache hit
+		report "read, cache hit ";
 		mco.rd <= '1';
 		wait until rising_edge(clk);
 		mco.rd <= '0';
@@ -77,24 +82,34 @@ begin
 		wait until rising_edge(clk);
 		
 		-- 3. write, cache miss
+		report "write, cache miss ";
 		mco.address <= 14x"00F0";
 		mco.wr <= '1';
 		mco.wrdata <= x"44445555";
+
+		wait until falling_edge(clk);
+		assert mmo.wr = '1';
+
 		wait until rising_edge(clk);
 		mco.wr <= '0';
 		wait until rising_edge(clk);
 		
 		-- 4. write, cache hit
+		report "write, cache hit ";
 		mco.address <= 14x"00E0";
 		mco.wr <= '1';
 		mco.byteena <= "0100";
 		mco.wrdata <= x"13571357";
+		wait until falling_edge(clk);
+		assert mmo.wr = '0';
+
 		wait until rising_edge(clk);
 		mco.wr <= '0';
 		wait until rising_edge(clk);
 		wait until rising_edge(clk);
 	
 		-- 5. read, cache hit
+		report "read, cache hit ";
 		mco.rd <= '1';
 		wait until rising_edge(clk);
 		mco.rd <= '0';
@@ -102,18 +117,33 @@ begin
 		wait until rising_edge(clk);
 		
 		-- 6. read, cache miss + dirty = wb
+		report "read, cache miss + dirty => wb ";
 		mco.address <= 14x"00F0";
 		mco.rd <= '1';
 		wait until rising_edge(clk);
 		mco.rd <= '0';
+		wait until falling_edge(clk);
+		assert mmo.wr = '1';
+
 		wait until rising_edge(clk);
 		mmi.busy <= '1';
+		wait until falling_edge(clk);
+		assert mmo.wr = '0';
+		assert mmo.rd = '1';
+
+		wait until falling_edge(clk);
+		assert mmo.wr = '0';
+		assert mmo.rd = '0';
+
 		wait until rising_edge(clk);
 		wait until rising_edge(clk);
 		mmi.busy <= '0';
 		mmi.rddata <= x"33221100";
 		wait until rising_edge(clk);
 		wait until rising_edge(clk);
+
+		report " Note, this test has asserts and is " &
+					 "primarily for waveform debugging.";
 
 		stop <= true;
 		wait;

@@ -3,7 +3,7 @@ quietly WaveActivateNextPane {} 0
 add wave -noupdate /tb/clk
 add wave -noupdate /tb/res_n
 add wave -noupdate -divider Input
-add wave -noupdate /tb/uut/cs.state
+add wave -noupdate /tb/uut/state
 add wave -noupdate /tb/uut/bypass_n
 add wave -noupdate -radix hexadecimal /tb/uut/tag_in
 add wave -noupdate -radix hexadecimal -childformat {{/tb/uut/index(2) -radix hexadecimal} {/tb/uut/index(1) -radix hexadecimal} {/tb/uut/index(0) -radix hexadecimal}} -subitemconfig {/tb/uut/index(2) {-height 16 -radix hexadecimal} /tb/uut/index(1) {-height 16 -radix hexadecimal} /tb/uut/index(0) {-height 16 -radix hexadecimal}} /tb/uut/index
